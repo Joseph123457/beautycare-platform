@@ -1,0 +1,44 @@
+services:
+  # ── Node.js 백엔드 API 서버 ──
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    env_file: ./backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+
+  # ── PostgreSQL 데이터베이스 ──
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: beautycare_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── Redis 캐시 ──
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
