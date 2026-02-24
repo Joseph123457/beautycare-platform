@@ -82,6 +82,7 @@ export type RootStackParamList = {
   MainTabs: undefined;
   HospitalDetail: { hospitalId: number };
   ReviewList: { hospitalId: number; hospitalName: string };
+  ReviewWrite: { hospitalId: number; hospitalName?: string };
   Booking: { hospitalId: number; hospitalName: string };
   Map: { lat: number; lng: number; category?: string };
   ChatRoom: { roomId: number; hospitalName: string };

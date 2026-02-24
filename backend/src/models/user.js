@@ -105,6 +105,18 @@ const User = {
   },
 
   /**
+   * 푸시 토큰 업데이트
+   * @param {number} userId - 사용자 ID
+   * @param {string} pushToken - FCM/Expo 푸시 토큰
+   */
+  updatePushToken: async (userId, pushToken) => {
+    await pool.query(
+      'UPDATE users SET push_token = $1, updated_at = NOW() WHERE user_id = $2',
+      [pushToken, userId]
+    );
+  },
+
+  /**
    * 사용자 정보 수정
    * @param {number} id - 사용자 ID (user_id)
    * @param {object} updates - { name, phone }

@@ -17,6 +17,7 @@ import ReviewListScreen from '../screens/ReviewListScreen';
 import BookingScreen from '../screens/BookingScreen';
 import MapScreen from '../screens/MapScreen';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
+import ReviewWriteScreen from '../screens/ReviewWriteScreen';
 
 import { RootStackParamList, TabParamList } from '../types';
 
@@ -106,6 +107,11 @@ export default function RootNavigator() {
         name="ChatRoom"
         component={ChatRoomScreen}
         options={({ route }) => ({ title: route.params.hospitalName })}
+      />
+      <Stack.Screen
+        name="ReviewWrite"
+        component={ReviewWriteScreen}
+        options={{ title: '리뷰 작성' }}
       />
     </Stack.Navigator>
   );

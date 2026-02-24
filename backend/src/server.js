@@ -10,6 +10,13 @@ const env = require('./config/env');
 const { pool, connectDB } = require('./config/database');
 const { setupChatHandlers, initRedis } = require('./socket/chat');
 const { generateMonthlyReport } = require('./services/aiAnalysis');
+const {
+  initFirebase,
+  scheduledReservationReminder,
+  scheduledReviewRequest,
+  scheduledUnansweredChatCheck,
+} = require('./services/pushNotification');
+const { initKakaoAlimtalk } = require('./services/kakaoAlimtalk');
 
 const start = async () => {
   try {
@@ -35,6 +42,27 @@ const start = async () => {
 
     // app에 io 인스턴스 저장 (REST API에서 소켓 이벤트 발생 시 사용)
     app.set('io', io);
+
+    // Firebase Cloud Messaging 초기화
+    initFirebase();
+
+    // 카카오 알림톡 초기화
+    initKakaoAlimtalk();
+
+    // ── 푸시 알림 스케줄러 ──────────────────────────────
+
+    // 매일 오전 9시(KST): 내일 예약 리마인더
+    cron.schedule('0 9 * * *', scheduledReservationReminder, {
+      timezone: 'Asia/Seoul',
+    });
+
+    // 매시간 정각: 시술 완료 24시간 후 리뷰 요청
+    cron.schedule('0 * * * *', scheduledReviewRequest);
+
+    // 매시간 30분: 미답변 채팅 체크 (24시간 초과)
+    cron.schedule('30 * * * *', scheduledUnansweredChatCheck);
+
+    console.log('[CRON] 푸시 알림 스케줄러 등록 완료');
 
     // 매월 1일 오전 3시에 전체 병원 월간 리포트 자동 생성
     cron.schedule('0 3 1 * *', async () => {

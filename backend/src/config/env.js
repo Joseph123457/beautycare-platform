@@ -34,6 +34,12 @@ module.exports = {
     appKey: process.env.KAKAO_APP_KEY || '',
   },
 
+  // 카카오 비즈메시지 (알림톡)
+  kakaoBiz: {
+    apiKey: process.env.KAKAO_BIZ_API_KEY || '',
+    senderKey: process.env.KAKAO_SENDER_KEY || '',
+  },
+
   // 토스페이먼츠
   toss: {
     secretKey: process.env.TOSS_SECRET_KEY || '',
@@ -43,6 +49,11 @@ module.exports = {
   // Anthropic Claude API
   anthropic: {
     apiKey: process.env.ANTHROPIC_API_KEY || '',
+  },
+
+  // Firebase Cloud Messaging
+  firebase: {
+    serviceAccountKey: process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '',
   },
 
   // Redis 캐시

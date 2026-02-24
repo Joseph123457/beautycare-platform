@@ -15,6 +15,8 @@ const reservationRoutes = require('./routes/reservations');
 const subscriptionRoutes = require('./routes/subscriptions');
 const chatRoutes = require('./routes/chats');
 const analysisRoutes = require('./routes/analysis');
+const userRoutes = require('./routes/users');
+const patientRoutes = require('./routes/patients');
 
 // 에러 핸들러 임포트
 const errorHandler = require('./middlewares/errorHandler');
@@ -51,6 +53,8 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/analysis', analysisRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/patients', patientRoutes);
 
 // 404 처리
 app.use((req, res) => {

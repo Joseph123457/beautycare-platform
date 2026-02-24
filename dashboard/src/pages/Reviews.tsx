@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import client from '../api/client';
 import { useAuth } from '../hooks/useAuth';
+import { FeatureLock } from '../components/FeatureLock';
+import { AIInsightCard } from '../components/AIInsightCard';
+import { KeywordCloud } from '../components/KeywordCloud';
+import { SentimentChart } from '../components/SentimentChart';
 
 // ─── 타입 정의 ─────────────────────────────────────────
 
@@ -21,6 +25,33 @@ interface Toast {
   id: number;
   message: string;
   type: 'success' | 'error';
+}
+
+// AI 분석 관련 타입
+interface MonthlyReport {
+  year: number;
+  month: number;
+  strengths: string[];
+  improvements: string[];
+  advice: string;
+  sentiment_score: number;
+}
+
+interface AIKeyword {
+  keyword: string;
+  count: number;
+  sentiment: 'positive' | 'negative' | 'neutral';
+}
+
+interface SentimentTrend {
+  label: string;
+  score: number;
+}
+
+interface SentimentRatio {
+  positive: number;
+  neutral: number;
+  negative: number;
 }
 
 // ─── 한국어 불용어 (키워드 추출에서 제외) ─────────────
@@ -207,6 +238,18 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
+// ─── 최근 3개월 연/월 생성 헬퍼 ──────────────────────
+
+function getRecent3Months(): { year: number; month: number }[] {
+  const now = new Date();
+  const months: { year: number; month: number }[] = [];
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() + 1 });
+  }
+  return months.reverse(); // 과거 → 현재 순서
+}
+
 // ─── 메인 컴포넌트 ────────────────────────────────────
 
 /** 리뷰 관리 페이지 */
@@ -223,6 +266,18 @@ export default function Reviews() {
   const [replyOpen, setReplyOpen] = useState<Record<string, boolean>>({});
   const [replyText, setReplyText] = useState<Record<string, string>>({});
   const [replyLoading, setReplyLoading] = useState<Record<string, boolean>>({});
+
+  // ─── AI 분석 상태 ───────────────────────────────────
+  const [currentTier, setCurrentTier] = useState<string>('FREE');
+  const [aiReport, setAiReport] = useState<MonthlyReport | null>(null);
+  const [aiKeywords, setAiKeywords] = useState<AIKeyword[]>([]);
+  const [sentimentTrends, setSentimentTrends] = useState<SentimentTrend[]>([]);
+  const [sentimentRatio, setSentimentRatio] = useState<SentimentRatio | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  // 키워드 필터링
+  const [activeKeyword, setActiveKeyword] = useState<string | null>(null);
 
   // 토스트
   const addToast = useCallback((message: string, type: 'success' | 'error') => {
@@ -252,9 +307,88 @@ export default function Reviews() {
     }
   }, [hospitalId, addToast]);
 
+  // 구독 등급 + AI 데이터 로드
+  const loadAIData = useCallback(async () => {
+    if (!hospitalId) return;
+
+    try {
+      // 1) 구독 등급 확인
+      const subRes = await client.get('/subscriptions/my');
+      const tier = subRes.data.data?.current_tier || 'FREE';
+      setCurrentTier(tier);
+
+      // FREE 플랜이면 AI 데이터 로드 생략
+      const tierLevel: Record<string, number> = { FREE: 0, BASIC: 1, PRO: 2 };
+      if ((tierLevel[tier] || 0) < 1) return;
+
+      // 2) BASIC 이상: AI 데이터 병렬 로드
+      setAiLoading(true);
+      setAiError(null);
+
+      const months = getRecent3Months();
+
+      const [reportsResults, keywordsRes] = await Promise.all([
+        // 3개월 월간 리포트 병렬 요청
+        Promise.allSettled(
+          months.map((m) =>
+            client.post('/analysis/monthly-report', { year: m.year, month: m.month })
+          )
+        ),
+        // 키워드 목록
+        client.get(`/analysis/keywords/${hospitalId}`),
+      ]);
+
+      // 월간 리포트 처리 → 트렌드 + 최신 리포트
+      const reports: MonthlyReport[] = [];
+      reportsResults.forEach((result, idx) => {
+        if (result.status === 'fulfilled' && result.value.data?.data) {
+          const d = result.value.data.data;
+          reports.push({
+            year: months[idx].year,
+            month: months[idx].month,
+            strengths: d.strengths || [],
+            improvements: d.improvements || [],
+            advice: d.advice || '',
+            sentiment_score: d.sentiment_score ?? 0,
+          });
+        }
+      });
+
+      // 감성 점수 추이
+      setSentimentTrends(
+        reports.map((r) => ({
+          label: `${r.year}.${String(r.month).padStart(2, '0')}`,
+          score: r.sentiment_score,
+        }))
+      );
+
+      // 최신 월 리포트 (마지막)
+      setAiReport(reports.length > 0 ? reports[reports.length - 1] : null);
+
+      // 키워드 처리
+      const kwData = keywordsRes.data?.data?.keywords || [];
+      setAiKeywords(kwData);
+
+      // 감성 비율 계산 (키워드 sentiment 기반)
+      const ratio: SentimentRatio = { positive: 0, neutral: 0, negative: 0 };
+      kwData.forEach((kw: AIKeyword) => {
+        ratio[kw.sentiment] = (ratio[kw.sentiment] || 0) + kw.count;
+      });
+      setSentimentRatio(ratio);
+    } catch {
+      setAiError('AI 분석 데이터를 불러오지 못했습니다');
+    } finally {
+      setAiLoading(false);
+    }
+  }, [hospitalId]);
+
   useEffect(() => {
     loadReviews(page);
   }, [page, loadReviews]);
+
+  useEffect(() => {
+    loadAIData();
+  }, [loadAIData]);
 
   // 통계 계산
   const stats = useMemo(() => {
@@ -265,6 +399,12 @@ export default function Reviews() {
     const pendingCount = reviews.filter((r) => !r.is_approved).length;
     return { total, avg, pendingCount };
   }, [reviews]);
+
+  // 키워드 필터링된 리뷰 목록
+  const filteredReviews = useMemo(() => {
+    if (!activeKeyword) return reviews;
+    return reviews.filter((r) => r.content.includes(activeKeyword));
+  }, [reviews, activeKeyword]);
 
   // 승인 처리
   const handleApprove = async (reviewId: string) => {
@@ -354,6 +494,64 @@ export default function Reviews() {
         </div>
       )}
 
+      {/* ─── AI 분석 섹션 (BASIC 이상) ────────────────── */}
+      <FeatureLock
+        currentTier={currentTier}
+        requiredTier="BASIC"
+        featureName="AI 리뷰 분석"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base font-bold text-gray-900">AI 리뷰 분석</h3>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-100 text-purple-700">
+              AI
+            </span>
+          </div>
+
+          {/* AI 인사이트 + 키워드 클라우드 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <AIInsightCard
+              report={aiReport}
+              loading={aiLoading}
+              error={aiError}
+              onRefresh={loadAIData}
+            />
+            <KeywordCloud
+              keywords={aiKeywords}
+              loading={aiLoading}
+              activeKeyword={activeKeyword}
+              onKeywordClick={setActiveKeyword}
+            />
+          </div>
+
+          {/* 감성 분석 차트 */}
+          <SentimentChart
+            trends={sentimentTrends}
+            ratio={sentimentRatio}
+            loading={aiLoading}
+          />
+        </div>
+      </FeatureLock>
+
+      {/* ─── 키워드 필터 인디케이터 ───────────────────── */}
+      {activeKeyword && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-lg">
+          <svg className="w-4 h-4 text-blue-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <span className="text-sm text-blue-700">
+            <strong>"{activeKeyword}"</strong> 키워드가 포함된 리뷰만 표시 중
+            ({filteredReviews.length}건)
+          </span>
+          <button
+            onClick={() => setActiveKeyword(null)}
+            className="ml-auto text-xs font-medium text-blue-600 hover:text-blue-800"
+          >
+            필터 해제
+          </button>
+        </div>
+      )}
+
       {/* 리뷰 목록 */}
       {loading ? (
         <div className="space-y-3">
@@ -361,13 +559,13 @@ export default function Reviews() {
           <SkeletonCard />
           <SkeletonCard />
         </div>
-      ) : reviews.length === 0 ? (
+      ) : filteredReviews.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">
-          리뷰가 없습니다
+          {activeKeyword ? `"${activeKeyword}" 키워드가 포함된 리뷰가 없습니다` : '리뷰가 없습니다'}
         </div>
       ) : (
         <div className="space-y-3">
-          {reviews.map((review) => (
+          {filteredReviews.map((review) => (
             <div
               key={review.review_id}
               className="bg-white rounded-xl border border-gray-200 p-5"
@@ -497,7 +695,7 @@ export default function Reviews() {
       )}
 
       {/* 페이지네이션 */}
-      {!loading && reviews.length > 0 && (
+      {!loading && filteredReviews.length > 0 && (
         <div className="flex justify-center gap-2">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
