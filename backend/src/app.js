@@ -12,6 +12,8 @@ const authRoutes = require('./routes/auth');
 const hospitalRoutes = require('./routes/hospitals');
 const reviewRoutes = require('./routes/reviews');
 const reservationRoutes = require('./routes/reservations');
+const subscriptionRoutes = require('./routes/subscriptions');
+const chatRoutes = require('./routes/chats');
 
 // 에러 핸들러 임포트
 const errorHandler = require('./middlewares/errorHandler');
@@ -45,6 +47,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/chats', chatRoutes);
 
 // 404 처리
 app.use((req, res) => {

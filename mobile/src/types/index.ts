@@ -84,11 +84,13 @@ export type RootStackParamList = {
   ReviewList: { hospitalId: number; hospitalName: string };
   Booking: { hospitalId: number; hospitalName: string };
   Map: { lat: number; lng: number; category?: string };
+  ChatRoom: { roomId: number; hospitalName: string };
 };
 
 export type TabParamList = {
   Home: undefined;
   Search: undefined;
+  Chat: undefined;
   MyReservations: undefined;
   Profile: undefined;
 };

@@ -34,6 +34,12 @@ module.exports = {
     appKey: process.env.KAKAO_APP_KEY || '',
   },
 
+  // 토스페이먼츠
+  toss: {
+    secretKey: process.env.TOSS_SECRET_KEY || '',
+    clientKey: process.env.TOSS_CLIENT_KEY || '',
+  },
+
   // Redis 캐시
   redis: {
     host: process.env.REDIS_HOST || 'localhost',

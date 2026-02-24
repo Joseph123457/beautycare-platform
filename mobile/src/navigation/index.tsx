@@ -1,6 +1,6 @@
 /**
  * 네비게이션 설정
- * 탭 네비게이터 (4개 탭) + 루트 스택 네비게이터 (상세 화면)
+ * 탭 네비게이터 (5개 탭) + 루트 스택 네비게이터 (상세 화면)
  */
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,12 +9,14 @@ import { Text } from 'react-native';
 
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
+import ChatListScreen from '../screens/ChatListScreen';
 import MyReservationsScreen from '../screens/MyReservationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import HospitalDetailScreen from '../screens/HospitalDetailScreen';
 import ReviewListScreen from '../screens/ReviewListScreen';
 import BookingScreen from '../screens/BookingScreen';
 import MapScreen from '../screens/MapScreen';
+import ChatRoomScreen from '../screens/ChatRoomScreen';
 
 import { RootStackParamList, TabParamList } from '../types';
 
@@ -26,6 +28,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const TAB_ICONS: Record<string, string> = {
   Home: '🏠',
   Search: '🔍',
+  Chat: '💬',
   MyReservations: '📅',
   Profile: '👤',
 };
@@ -55,6 +58,7 @@ function MainTabs() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '홈' }} />
       <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarLabel: '탐색' }} />
+      <Tab.Screen name="Chat" component={ChatListScreen} options={{ tabBarLabel: '채팅' }} />
       <Tab.Screen name="MyReservations" component={MyReservationsScreen} options={{ tabBarLabel: '예약' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: '마이' }} />
     </Tab.Navigator>
@@ -97,6 +101,11 @@ export default function RootNavigator() {
         name="Map"
         component={MapScreen}
         options={{ title: '지도로 보기' }}
+      />
+      <Stack.Screen
+        name="ChatRoom"
+        component={ChatRoomScreen}
+        options={({ route }) => ({ title: route.params.hospitalName })}
       />
     </Stack.Navigator>
   );

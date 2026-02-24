@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Reservations from './pages/Reservations';
 import Reviews from './pages/Reviews';
+import Subscription from './pages/Subscription';
+import Chats from './pages/Chats';
 
 /** 루트 컴포넌트 – 라우팅 및 인증 관리 */
 export default function App() {
@@ -47,6 +49,8 @@ export default function App() {
           <Route index element={<Dashboard />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="reviews" element={<Reviews />} />
+          <Route path="subscription" element={<Subscription />} />
+          <Route path="chats" element={<Chats />} />
         </Route>
 
         {/* 존재하지 않는 경로 → 홈으로 리다이렉트 */}
