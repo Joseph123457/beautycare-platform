@@ -10,6 +10,7 @@ const { pool } = require('../config/database');
 const Review = require('../models/review');
 const Hospital = require('../models/hospital');
 const { successResponse, errorResponse } = require('../utils/response');
+const { analyzeReviewSentiment } = require('../services/aiAnalysis');
 
 // ─── 1. 리뷰 작성 ──────────────────────────────────────
 
@@ -270,6 +271,19 @@ const approveReview = async (req, res, next) => {
     }
 
     const updated = await Review.approve(reviewId);
+
+    // AI 감성 분석 (비동기 - 응답을 차단하지 않음)
+    analyzeReviewSentiment(review.content, review.rating)
+      .then(async (analysis) => {
+        if (analysis) {
+          await pool.query(
+            'UPDATE reviews SET ai_analysis = $1 WHERE review_id = $2',
+            [JSON.stringify(analysis), reviewId]
+          );
+        }
+      })
+      .catch((err) => console.error('AI 분석 실패:', err));
+
     return successResponse(res, updated, '리뷰가 승인되었습니다');
   } catch (error) {
     next(error);

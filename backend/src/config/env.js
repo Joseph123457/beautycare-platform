@@ -40,6 +40,11 @@ module.exports = {
     clientKey: process.env.TOSS_CLIENT_KEY || '',
   },
 
+  // Anthropic Claude API
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY || '',
+  },
+
   // Redis 캐시
   redis: {
     host: process.env.REDIS_HOST || 'localhost',

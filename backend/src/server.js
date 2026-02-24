@@ -4,10 +4,12 @@
  */
 const http = require('http');
 const { Server } = require('socket.io');
+const cron = require('node-cron');
 const app = require('./app');
 const env = require('./config/env');
-const { connectDB } = require('./config/database');
+const { pool, connectDB } = require('./config/database');
 const { setupChatHandlers, initRedis } = require('./socket/chat');
+const { generateMonthlyReport } = require('./services/aiAnalysis');
 
 const start = async () => {
   try {
@@ -33,6 +35,36 @@ const start = async () => {
 
     // app에 io 인스턴스 저장 (REST API에서 소켓 이벤트 발생 시 사용)
     app.set('io', io);
+
+    // 매월 1일 오전 3시에 전체 병원 월간 리포트 자동 생성
+    cron.schedule('0 3 1 * *', async () => {
+      console.log('[CRON] 월간 리포트 자동 생성 시작');
+      try {
+        const now = new Date();
+        // 이전 달 계산
+        const target = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const year = target.getFullYear();
+        const month = target.getMonth() + 1;
+
+        // 활성 병원 목록 조회
+        const { rows: hospitals } = await pool.query(
+          'SELECT hospital_id FROM hospitals WHERE is_active = true'
+        );
+
+        let success = 0;
+        for (const h of hospitals) {
+          try {
+            await generateMonthlyReport(h.hospital_id, year, month);
+            success++;
+          } catch (err) {
+            console.error(`[CRON] 병원 ${h.hospital_id} 리포트 생성 실패:`, err.message);
+          }
+        }
+        console.log(`[CRON] 월간 리포트 완료: ${success}/${hospitals.length}건`);
+      } catch (error) {
+        console.error('[CRON] 월간 리포트 스케줄러 실패:', error.message);
+      }
+    });
 
     // 서버 시작
     server.listen(env.port, () => {
