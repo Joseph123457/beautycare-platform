@@ -62,4 +62,20 @@ module.exports = {
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_PASSWORD || '',
   },
+
+  // DeepL 번역 API
+  deepl: {
+    apiKey: process.env.DEEPL_API_KEY || '',
+  },
+
+  // 환율 API (exchangerate-api.com)
+  exchangeRate: {
+    apiKey: process.env.EXCHANGE_RATE_API_KEY || '',
+  },
+
+  // Stripe (외국인 결제)
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
+  },
 };

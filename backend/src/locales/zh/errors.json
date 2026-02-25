@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "tokenRequired": "需要认证令牌",
+    "tokenExpired": "令牌已过期",
+    "tokenInvalid": "无效的令牌",
+    "tokenTypeInvalid": "无效的令牌类型",
+    "loginFailed": "邮箱或密码不正确",
+    "emailExists": "该邮箱已被使用",
+    "refreshFailed": "令牌刷新失败"
+  },
+  "reservation": {
+    "notFound": "未找到预约",
+    "notOwner": "只能查看本人的预约",
+    "cancelNotOwner": "只能取消本人的预约",
+    "alreadyCancelled": "该预约已取消或无法取消",
+    "statusChangeForbidden": "您没有权限更改此预约的状态",
+    "statusChangeInvalid": "无法更改为指定状态",
+    "statusRequired": "请输入要更改的状态"
+  },
+  "review": {
+    "notFound": "未找到评价",
+    "alreadyExists": "您已对此预约发表过评价",
+    "notOwner": "只能编辑本人的评价"
+  },
+  "hospital": {
+    "notFound": "未找到医院",
+    "notOwner": "您没有该医院的权限",
+    "noHospital": "未找到已注册的医院",
+    "reservationForbidden": "您没有权限查看该医院的预约"
+  },
+  "subscription": {
+    "required": "此功能需要{{tier}}套餐或以上",
+    "notFound": "未找到订阅信息"
+  },
+  "analytics": {
+    "forbidden": "您没有权限查看该医院的统计数据"
+  },
+  "patient": {
+    "limitExceeded": "FREE套餐最多可查看{{limit}}位患者",
+    "bulkMessageForbidden": "群发消息仅在PRO套餐中可用"
+  },
+  "common": {
+    "serverError": "服务器发生错误",
+    "notFound": "未找到请求的资源",
+    "validationError": "输入值不正确",
+    "unauthorized": "需要登录",
+    "forbidden": "没有访问权限"
+  }
+}

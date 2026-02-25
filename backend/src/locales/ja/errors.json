@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "tokenRequired": "認証トークンが必要です",
+    "tokenExpired": "トークンの有効期限が切れています",
+    "tokenInvalid": "無効なトークンです",
+    "tokenTypeInvalid": "無効なトークンタイプです",
+    "loginFailed": "メールアドレスまたはパスワードが正しくありません",
+    "emailExists": "既に使用されているメールアドレスです",
+    "refreshFailed": "トークンの更新に失敗しました"
+  },
+  "reservation": {
+    "notFound": "予約が見つかりません",
+    "notOwner": "ご本人の予約のみ閲覧できます",
+    "cancelNotOwner": "ご本人の予約のみキャンセルできます",
+    "alreadyCancelled": "既にキャンセル済みか、キャンセルできない予約です",
+    "statusChangeForbidden": "この予約のステータスを変更する権限がありません",
+    "statusChangeInvalid": "指定されたステータスに変更できません",
+    "statusRequired": "変更するステータスを入力してください"
+  },
+  "review": {
+    "notFound": "レビューが見つかりません",
+    "alreadyExists": "この予約に対するレビューは既に投稿済みです",
+    "notOwner": "ご本人のレビューのみ編集できます"
+  },
+  "hospital": {
+    "notFound": "病院が見つかりません",
+    "notOwner": "この病院の権限がありません",
+    "noHospital": "登録された病院がありません",
+    "reservationForbidden": "この病院の予約を閲覧する権限がありません"
+  },
+  "subscription": {
+    "required": "この機能は{{tier}}プラン以上でご利用いただけます",
+    "notFound": "サブスクリプション情報が見つかりません"
+  },
+  "analytics": {
+    "forbidden": "この病院の統計を閲覧する権限がありません"
+  },
+  "patient": {
+    "limitExceeded": "FREEプランでは患者{{limit}}名まで閲覧可能です",
+    "bulkMessageForbidden": "一括メッセージはPROプランでご利用いただけます"
+  },
+  "common": {
+    "serverError": "サーバーエラーが発生しました",
+    "notFound": "リクエストされたリソースが見つかりません",
+    "validationError": "入力値が正しくありません",
+    "unauthorized": "ログインが必要です",
+    "forbidden": "アクセス権限がありません"
+  }
+}

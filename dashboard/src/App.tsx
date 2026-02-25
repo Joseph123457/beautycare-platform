@@ -8,6 +8,7 @@ import Reviews from './pages/Reviews';
 import Subscription from './pages/Subscription';
 import Chats from './pages/Chats';
 import Patients from './pages/Patients';
+import Analytics from './pages/Analytics';
 
 /** 루트 컴포넌트 – 라우팅 및 인증 관리 */
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="subscription" element={<Subscription />} />
           <Route path="chats" element={<Chats />} />
           <Route path="patients" element={<Patients />} />
+          <Route path="analytics" element={<Analytics />} />
         </Route>
 
         {/* 존재하지 않는 경로 → 홈으로 리다이렉트 */}

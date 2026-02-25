@@ -1,0 +1,58 @@
+{
+  "reservation": {
+    "confirmed": "Your reservation has been confirmed",
+    "cancelled": "Your reservation has been cancelled",
+    "created": "Reservation created successfully",
+    "updated": "Reservation status has been updated",
+    "reminder": "You have a reservation at {{hospital}}",
+    "listSuccess": "Reservations retrieved successfully",
+    "detailSuccess": "Reservation details retrieved successfully",
+    "hospitalListSuccess": "Hospital reservations retrieved successfully"
+  },
+  "review": {
+    "request": "How was your visit? Please leave an honest review",
+    "approved": "Your review has been approved",
+    "created": "Review submitted successfully",
+    "replied": "Reply has been posted",
+    "helpfulAdded": "Marked as helpful",
+    "helpfulRemoved": "Removed helpful mark"
+  },
+  "hospital": {
+    "listSuccess": "Hospitals retrieved successfully",
+    "detailSuccess": "Hospital details retrieved successfully",
+    "created": "Hospital registered successfully",
+    "updated": "Hospital information updated"
+  },
+  "auth": {
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "signupSuccess": "Sign up successful",
+    "tokenRefreshed": "Token has been refreshed"
+  },
+  "subscription": {
+    "activated": "Subscription activated",
+    "cancelled": "Subscription cancelled",
+    "planInfo": "Subscription info retrieved successfully"
+  },
+  "patient": {
+    "listSuccess": "Patient list retrieved successfully",
+    "detailSuccess": "Patient details retrieved successfully",
+    "memoCreated": "Memo saved successfully",
+    "bulkMessageSent": "Bulk message sent successfully"
+  },
+  "analytics": {
+    "overviewSuccess": "Overview statistics retrieved successfully",
+    "treatmentsSuccess": "Treatment analysis retrieved successfully",
+    "timeSuccess": "Time analysis retrieved successfully",
+    "exposureSuccess": "Exposure analysis retrieved successfully",
+    "cached": "(cached)"
+  },
+  "chat": {
+    "listSuccess": "Chat list retrieved successfully",
+    "messageSuccess": "Messages retrieved successfully"
+  },
+  "common": {
+    "success": "Request successful",
+    "serverHealthy": "Server is running normally"
+  }
+}

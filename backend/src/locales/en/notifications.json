@@ -1,0 +1,36 @@
+{
+  "push": {
+    "reservation": {
+      "confirmedTitle": "Reservation Confirmed",
+      "confirmedBody": "Your {{treatment}} reservation at {{hospital}} has been confirmed",
+      "reminderTitle": "Reservation Reminder",
+      "reminderBody": "You have a visit to {{hospital}} tomorrow at {{time}}",
+      "cancelledTitle": "Reservation Cancelled",
+      "cancelledBody": "Your {{treatment}} reservation at {{hospital}} has been cancelled"
+    },
+    "review": {
+      "requestTitle": "Review Request",
+      "requestBody": "How was your visit to {{hospital}}? Please share your experience",
+      "approvedTitle": "Review Approved",
+      "approvedBody": "Your review has been approved and is now public"
+    },
+    "chat": {
+      "newMessageTitle": "New Message",
+      "newMessageBody": "{{sender}} sent you a message"
+    },
+    "promotion": {
+      "title": "Special Offer",
+      "body": "{{hospital}} is offering a {{discount}} discount event"
+    }
+  },
+  "alimtalk": {
+    "reservation": {
+      "confirmed": "[BeautyCare] Your reservation at {{hospital}} has been confirmed.\nTreatment: {{treatment}}\nDate: {{date}}\nContact: {{phone}}",
+      "reminder": "[BeautyCare] Reminder: Visit to {{hospital}} tomorrow.\nTreatment: {{treatment}}\nDate: {{date}}",
+      "cancelled": "[BeautyCare] Your reservation at {{hospital}} has been cancelled.\nTreatment: {{treatment}}\nReason: {{reason}}"
+    },
+    "review": {
+      "request": "[BeautyCare] Was your visit to {{hospital}} satisfactory?\nPlease leave an honest review.\n{{link}}"
+    }
+  }
+}

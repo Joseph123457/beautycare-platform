@@ -11,17 +11,21 @@
  *   POST /           — 병원 등록
  *   PUT  /:id        — 병원 수정
  *   DELETE /:id      — 병원 삭제
+ *   POST /:id/translate                    — 병원 정보 수동 번역
+ *   POST /:id/treatments/:tid/translate    — 시술 정보 수동 번역
  */
 const express = require('express');
 const { body, query } = require('express-validator');
 const authMiddleware = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 
-// 검색·상세·카테고리 컨트롤러
+// 검색·상세·카테고리·번역 컨트롤러
 const {
   searchHospitals,
   getHospitalDetail,
   getCategories,
+  translateHospital,
+  translateTreatment,
 } = require('../controllers/hospitals');
 
 // 기존 CRUD 컨트롤러
@@ -88,5 +92,13 @@ router.put('/:id', authMiddleware, updateHospital);
 
 // DELETE /api/hospitals/:id — 병원 삭제
 router.delete('/:id', authMiddleware, deleteHospital);
+
+// ─── 번역 라우트 (인증 필요) ─────────────────────────
+
+// POST /api/hospitals/:id/translate — 병원 정보 수동 번역 요청
+router.post('/:id/translate', authMiddleware, translateHospital);
+
+// POST /api/hospitals/:id/treatments/:treatmentId/translate — 시술 정보 수동 번역 요청
+router.post('/:id/treatments/:treatmentId/translate', authMiddleware, translateTreatment);
 
 module.exports = router;

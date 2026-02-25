@@ -1,0 +1,36 @@
+{
+  "push": {
+    "reservation": {
+      "confirmedTitle": "予約確定",
+      "confirmedBody": "{{hospital}}の{{treatment}}予約が確定しました",
+      "reminderTitle": "予約リマインダー",
+      "reminderBody": "明日{{time}}に{{hospital}}のご来院予定です",
+      "cancelledTitle": "予約キャンセル",
+      "cancelledBody": "{{hospital}}の{{treatment}}予約がキャンセルされました"
+    },
+    "review": {
+      "requestTitle": "レビューのお願い",
+      "requestBody": "{{hospital}}のご来院はいかがでしたか？ぜひレビューをお寄せください",
+      "approvedTitle": "レビュー承認",
+      "approvedBody": "投稿されたレビューが承認され、公開されました"
+    },
+    "chat": {
+      "newMessageTitle": "新しいメッセージ",
+      "newMessageBody": "{{sender}}さんからメッセージが届きました"
+    },
+    "promotion": {
+      "title": "特別キャンペーン",
+      "body": "{{hospital}}で{{discount}}割引キャンペーンを実施中です"
+    }
+  },
+  "alimtalk": {
+    "reservation": {
+      "confirmed": "[BeautyCare] {{hospital}}の予約が確定しました。\n施術: {{treatment}}\n日時: {{date}}\nお問い合わせ: {{phone}}",
+      "reminder": "[BeautyCare] 明日{{hospital}}のご来院予定です。\n施術: {{treatment}}\n日時: {{date}}",
+      "cancelled": "[BeautyCare] {{hospital}}の予約がキャンセルされました。\n施術: {{treatment}}\n理由: {{reason}}"
+    },
+    "review": {
+      "request": "[BeautyCare] {{hospital}}のご来院はいかがでしたか？\n率直なレビューをお願いします。\n{{link}}"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "push": {
+    "reservation": {
+      "confirmedTitle": "예약 확정",
+      "confirmedBody": "{{hospital}}의 {{treatment}} 예약이 확정되었습니다",
+      "reminderTitle": "예약 알림",
+      "reminderBody": "내일 {{time}}에 {{hospital}} 방문 예정입니다",
+      "cancelledTitle": "예약 취소",
+      "cancelledBody": "{{hospital}}의 {{treatment}} 예약이 취소되었습니다"
+    },
+    "review": {
+      "requestTitle": "리뷰 요청",
+      "requestBody": "{{hospital}} 방문은 어떠셨나요? 솔직한 후기를 남겨주세요",
+      "approvedTitle": "리뷰 승인",
+      "approvedBody": "작성하신 리뷰가 승인되어 공개되었습니다"
+    },
+    "chat": {
+      "newMessageTitle": "새 메시지",
+      "newMessageBody": "{{sender}}님이 메시지를 보냈습니다"
+    },
+    "promotion": {
+      "title": "특별 혜택",
+      "body": "{{hospital}}에서 {{discount}} 할인 이벤트를 진행 중입니다"
+    }
+  },
+  "alimtalk": {
+    "reservation": {
+      "confirmed": "[뷰티케어] {{hospital}} 예약이 확정되었습니다.\n시술: {{treatment}}\n일시: {{date}}\n문의: {{phone}}",
+      "reminder": "[뷰티케어] 내일 {{hospital}} 방문 예정입니다.\n시술: {{treatment}}\n일시: {{date}}",
+      "cancelled": "[뷰티케어] {{hospital}} 예약이 취소되었습니다.\n시술: {{treatment}}\n사유: {{reason}}"
+    },
+    "review": {
+      "request": "[뷰티케어] {{hospital}} 방문은 만족스러우셨나요?\n솔직한 후기를 남겨주세요.\n{{link}}"
+    }
+  }
+}

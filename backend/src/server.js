@@ -17,9 +17,13 @@ const {
   scheduledUnansweredChatCheck,
 } = require('./services/pushNotification');
 const { initKakaoAlimtalk } = require('./services/kakaoAlimtalk');
+const { initI18n } = require('./config/i18n');
 
 const start = async () => {
   try {
+    // 다국어(i18n) 초기화
+    await initI18n();
+
     // 데이터베이스 연결
     await connectDB();
 

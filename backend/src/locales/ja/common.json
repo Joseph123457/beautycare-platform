@@ -1,0 +1,58 @@
+{
+  "reservation": {
+    "confirmed": "予約が確定しました",
+    "cancelled": "予約がキャンセルされました",
+    "created": "予約が作成されました",
+    "updated": "予約のステータスが変更されました",
+    "reminder": "{{hospital}}のご予約があります",
+    "listSuccess": "予約一覧の取得に成功しました",
+    "detailSuccess": "予約詳細の取得に成功しました",
+    "hospitalListSuccess": "病院予約一覧の取得に成功しました"
+  },
+  "review": {
+    "request": "ご来院はいかがでしたか？率直なレビューをお願いします",
+    "approved": "レビューが承認されました",
+    "created": "レビューが投稿されました",
+    "replied": "返信が登録されました",
+    "helpfulAdded": "「参考になった」を押しました",
+    "helpfulRemoved": "「参考になった」を取り消しました"
+  },
+  "hospital": {
+    "listSuccess": "病院一覧の取得に成功しました",
+    "detailSuccess": "病院詳細の取得に成功しました",
+    "created": "病院が登録されました",
+    "updated": "病院情報が更新されました"
+  },
+  "auth": {
+    "loginSuccess": "ログイン成功",
+    "logoutSuccess": "ログアウト成功",
+    "signupSuccess": "会員登録成功",
+    "tokenRefreshed": "トークンが更新されました"
+  },
+  "subscription": {
+    "activated": "サブスクリプションが有効になりました",
+    "cancelled": "サブスクリプションが解約されました",
+    "planInfo": "サブスクリプション情報の取得に成功しました"
+  },
+  "patient": {
+    "listSuccess": "患者一覧の取得に成功しました",
+    "detailSuccess": "患者詳細の取得に成功しました",
+    "memoCreated": "メモが保存されました",
+    "bulkMessageSent": "一括メッセージが送信されました"
+  },
+  "analytics": {
+    "overviewSuccess": "全体概況の取得に成功しました",
+    "treatmentsSuccess": "施術別分析の取得に成功しました",
+    "timeSuccess": "時間帯分析の取得に成功しました",
+    "exposureSuccess": "露出分析の取得に成功しました",
+    "cached": "（キャッシュ）"
+  },
+  "chat": {
+    "listSuccess": "チャット一覧の取得に成功しました",
+    "messageSuccess": "メッセージの取得に成功しました"
+  },
+  "common": {
+    "success": "リクエストが成功しました",
+    "serverHealthy": "サーバーは正常に稼働しています"
+  }
+}

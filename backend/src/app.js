@@ -15,8 +15,14 @@ const reservationRoutes = require('./routes/reservations');
 const subscriptionRoutes = require('./routes/subscriptions');
 const chatRoutes = require('./routes/chats');
 const analysisRoutes = require('./routes/analysis');
+const analyticsRoutes = require('./routes/analytics');
 const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
+const stripePaymentRoutes = require('./routes/stripePayments');
+const exchangeRateRoutes = require('./routes/exchangeRates');
+
+// 다국어 미들웨어
+const i18nMiddleware = require('./middlewares/i18n');
 
 // 에러 핸들러 임포트
 const errorHandler = require('./middlewares/errorHandler');
@@ -34,15 +40,21 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Stripe 웹훅 (raw body 필요 — JSON 파서 전에 마운트)
+app.use('/api/payments/stripe/confirm', express.raw({ type: 'application/json' }), stripePaymentRoutes.webhookRouter);
+
 // JSON 요청 본문 파싱
 app.use(express.json());
 
 // URL-encoded 요청 본문 파싱
 app.use(express.urlencoded({ extended: true }));
 
+// 다국어 처리 (Accept-Language 감지 → req.language, req.t 주입)
+app.use(i18nMiddleware);
+
 // 헬스 체크 엔드포인트
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, data: null, message: '서버가 정상 작동 중입니다' });
+  res.json({ success: true, data: null, message: req.t('common:common.serverHealthy') });
 });
 
 // API 라우트 마운트
@@ -53,15 +65,18 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/analysis', analysisRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
+app.use('/api/payments/stripe', stripePaymentRoutes);
+app.use('/api/exchange-rates', exchangeRateRoutes);
 
 // 404 처리
 app.use((req, res) => {
   res.status(404).json({
     success: false,
     data: null,
-    message: '요청한 리소스를 찾을 수 없습니다',
+    message: req.t('errors:common.notFound'),
   });
 });
 

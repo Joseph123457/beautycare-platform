@@ -1,0 +1,36 @@
+{
+  "push": {
+    "reservation": {
+      "confirmedTitle": "预约已确认",
+      "confirmedBody": "您在{{hospital}}的{{treatment}}预约已确认",
+      "reminderTitle": "预约提醒",
+      "reminderBody": "明天{{time}}您预约了{{hospital}}就诊",
+      "cancelledTitle": "预约已取消",
+      "cancelledBody": "您在{{hospital}}的{{treatment}}预约已取消"
+    },
+    "review": {
+      "requestTitle": "评价邀请",
+      "requestBody": "您在{{hospital}}的就诊体验如何？请分享您的真实感受",
+      "approvedTitle": "评价已通过",
+      "approvedBody": "您发表的评价已通过审核并公开"
+    },
+    "chat": {
+      "newMessageTitle": "新消息",
+      "newMessageBody": "{{sender}}向您发送了一条消息"
+    },
+    "promotion": {
+      "title": "特别优惠",
+      "body": "{{hospital}}正在进行{{discount}}折扣活动"
+    }
+  },
+  "alimtalk": {
+    "reservation": {
+      "confirmed": "[BeautyCare] 您在{{hospital}}的预约已确认。\n项目: {{treatment}}\n时间: {{date}}\n咨询: {{phone}}",
+      "reminder": "[BeautyCare] 提醒：明天到{{hospital}}就诊。\n项目: {{treatment}}\n时间: {{date}}",
+      "cancelled": "[BeautyCare] 您在{{hospital}}的预约已取消。\n项目: {{treatment}}\n原因: {{reason}}"
+    },
+    "review": {
+      "request": "[BeautyCare] 您对{{hospital}}的就诊满意吗？\n请留下您的真实评价。\n{{link}}"
+    }
+  }
+}

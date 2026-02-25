@@ -1,0 +1,58 @@
+{
+  "reservation": {
+    "confirmed": "预约已确认",
+    "cancelled": "预约已取消",
+    "created": "预约创建成功",
+    "updated": "预约状态已更新",
+    "reminder": "您在{{hospital}}有一个预约",
+    "listSuccess": "预约列表获取成功",
+    "detailSuccess": "预约详情获取成功",
+    "hospitalListSuccess": "医院预约列表获取成功"
+  },
+  "review": {
+    "request": "您的就诊体验如何？请留下真实评价",
+    "approved": "评价已通过审核",
+    "created": "评价提交成功",
+    "replied": "回复已发布",
+    "helpfulAdded": "已标记为有帮助",
+    "helpfulRemoved": "已取消有帮助标记"
+  },
+  "hospital": {
+    "listSuccess": "医院列表获取成功",
+    "detailSuccess": "医院详情获取成功",
+    "created": "医院注册成功",
+    "updated": "医院信息已更新"
+  },
+  "auth": {
+    "loginSuccess": "登录成功",
+    "logoutSuccess": "退出登录成功",
+    "signupSuccess": "注册成功",
+    "tokenRefreshed": "令牌已刷新"
+  },
+  "subscription": {
+    "activated": "订阅已激活",
+    "cancelled": "订阅已取消",
+    "planInfo": "订阅信息获取成功"
+  },
+  "patient": {
+    "listSuccess": "患者列表获取成功",
+    "detailSuccess": "患者详情获取成功",
+    "memoCreated": "备忘录保存成功",
+    "bulkMessageSent": "群发消息发送成功"
+  },
+  "analytics": {
+    "overviewSuccess": "总体概况获取成功",
+    "treatmentsSuccess": "项目分析获取成功",
+    "timeSuccess": "时段分析获取成功",
+    "exposureSuccess": "曝光分析获取成功",
+    "cached": "（缓存）"
+  },
+  "chat": {
+    "listSuccess": "聊天列表获取成功",
+    "messageSuccess": "消息获取成功"
+  },
+  "common": {
+    "success": "请求成功",
+    "serverHealthy": "服务器运行正常"
+  }
+}

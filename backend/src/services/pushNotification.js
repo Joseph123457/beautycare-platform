@@ -430,6 +430,7 @@ module.exports = {
   notifyNewReservation,
   notifyNewReview,
   notifyUnansweredChat,
+  getHospitalStaffIds,
 
   // 스케줄 작업
   scheduledReservationReminder,

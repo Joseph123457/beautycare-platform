@@ -1,0 +1,49 @@
+{
+  "auth": {
+    "tokenRequired": "Authentication token is required",
+    "tokenExpired": "Token has expired",
+    "tokenInvalid": "Invalid token",
+    "tokenTypeInvalid": "Invalid token type",
+    "loginFailed": "Incorrect email or password",
+    "emailExists": "This email is already in use",
+    "refreshFailed": "Token refresh failed"
+  },
+  "reservation": {
+    "notFound": "Reservation not found",
+    "notOwner": "You can only view your own reservations",
+    "cancelNotOwner": "You can only cancel your own reservations",
+    "alreadyCancelled": "This reservation has already been cancelled or cannot be cancelled",
+    "statusChangeForbidden": "You do not have permission to change this reservation's status",
+    "statusChangeInvalid": "Cannot change to the requested status",
+    "statusRequired": "Please specify the new status"
+  },
+  "review": {
+    "notFound": "Review not found",
+    "alreadyExists": "You have already written a review for this reservation",
+    "notOwner": "You can only edit your own reviews"
+  },
+  "hospital": {
+    "notFound": "Hospital not found",
+    "notOwner": "You do not have permission for this hospital",
+    "noHospital": "No registered hospital found",
+    "reservationForbidden": "You do not have permission to view this hospital's reservations"
+  },
+  "subscription": {
+    "required": "This feature requires a {{tier}} plan or above",
+    "notFound": "Subscription not found"
+  },
+  "analytics": {
+    "forbidden": "You do not have permission to view this hospital's analytics"
+  },
+  "patient": {
+    "limitExceeded": "FREE plan allows viewing up to {{limit}} patients",
+    "bulkMessageForbidden": "Bulk messaging is available on PRO plan"
+  },
+  "common": {
+    "serverError": "An internal server error occurred",
+    "notFound": "The requested resource was not found",
+    "validationError": "Invalid input values",
+    "unauthorized": "Authentication is required",
+    "forbidden": "Access denied"
+  }
+}
