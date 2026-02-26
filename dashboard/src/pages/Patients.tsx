@@ -12,6 +12,13 @@ interface Patient {
   visit_count: number;
   last_visit: string | null;
   total_spent: number;
+  // 외국인 환자 추가 정보
+  preferred_language?: string;
+  nationality?: string;
+  has_interpreter?: boolean;
+  arrival_date?: string | null;
+  departure_date?: string | null;
+  stripe_paid?: boolean;
 }
 
 interface PatientDetail {
@@ -26,6 +33,13 @@ interface PatientDetail {
   reservations: ReservationItem[];
   reviews: ReviewItem[];
   memos: MemoItem[];
+  // 외국인 환자 추가 정보
+  preferred_language?: string;
+  nationality?: string;
+  has_interpreter?: boolean;
+  arrival_date?: string | null;
+  departure_date?: string | null;
+  stripe_paid?: boolean;
 }
 
 interface ReservationItem {
@@ -75,6 +89,17 @@ const STATUS_LABEL: Record<string, string> = {
   PENDING: '대기', CONFIRMED: '확정', DONE: '완료', CANCELLED: '취소',
 };
 const TIER_LEVEL: Record<string, number> = { FREE: 0, BASIC: 1, PRO: 2 };
+
+// 국적·언어 매핑
+const FLAG_EMOJI: Record<string, string> = {
+  en: '🇺🇸', ja: '🇯🇵', zh: '🇨🇳', ko: '🇰🇷',
+  US: '🇺🇸', JP: '🇯🇵', CN: '🇨🇳', KR: '🇰🇷',
+  GB: '🇬🇧', TW: '🇹🇼', HK: '🇭🇰', TH: '🇹🇭',
+  VN: '🇻🇳', PH: '🇵🇭', SG: '🇸🇬', MY: '🇲🇾',
+};
+const LANG_NAME: Record<string, string> = {
+  en: 'English', ja: '日本語', zh: '中文', ko: '한국어',
+};
 
 // ─── 헬퍼 ─────────────────────────────────────────────
 
@@ -166,6 +191,7 @@ export default function Patients() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [sort, setSort] = useState<'last_visit' | 'visit_count'>('last_visit');
+  const [tab, setTab] = useState<'all' | 'foreign'>('all');
 
   // 사이드 패널
   const [selId, setSelId] = useState<number | null>(null);
@@ -204,14 +230,15 @@ export default function Patients() {
     try {
       const params: Record<string, string | number> = { page, limit: 20, sort };
       if (search) params.search = search;
+      if (tab === 'foreign') params.type = 'foreign';
       const { data } = await client.get('/patients', { params });
       setPatients(data.data?.patients || []);
       setPg(data.data?.pagination || { page: 1, limit: 20, total: 0, totalPages: 0 });
     } catch { toast('환자 목록을 불러오지 못했습니다', 'error'); }
     finally { setLoading(false); }
-  }, [search, sort, toast]);
+  }, [search, sort, tab, toast]);
 
-  useEffect(() => { if (hospitalId) loadList(pg.page); }, [hospitalId, search, sort]); // eslint-disable-line
+  useEffect(() => { if (hospitalId) loadList(pg.page); }, [hospitalId, search, sort, tab]); // eslint-disable-line
 
   // 환자 상세
   const loadDetail = useCallback(async (uid: number) => {
@@ -275,6 +302,18 @@ export default function Patients() {
         </button>
       </div>
 
+      {/* 환자 유형 탭 */}
+      <div className="flex bg-gray-100 rounded-lg p-1 w-fit">
+        <button onClick={() => { setTab('all'); setPg((p) => ({ ...p, page: 1 })); }}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${tab === 'all' ? 'bg-white text-[#1E5FA8] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+          전체 환자
+        </button>
+        <button onClick={() => { setTab('foreign'); setPg((p) => ({ ...p, page: 1 })); }}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-1.5 ${tab === 'foreign' ? 'bg-white text-[#1E5FA8] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}>
+          🌍 외국인 환자
+        </button>
+      </div>
+
       {/* 요약 카드 */}
       <div className="flex gap-4 flex-wrap">
         <StatCard icon={<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
@@ -321,9 +360,20 @@ export default function Patients() {
                 <tr className="border-b border-gray-100 text-left bg-gray-50/50">
                   <th className="px-5 py-3 font-medium text-gray-500">이름</th>
                   <th className="px-5 py-3 font-medium text-gray-500">연락처</th>
+                  {tab === 'foreign' && <th className="px-5 py-3 font-medium text-gray-500 text-center">언어</th>}
                   <th className="px-5 py-3 font-medium text-gray-500 text-center">방문 횟수</th>
-                  <th className="px-5 py-3 font-medium text-gray-500">마지막 방문일</th>
-                  <th className="px-5 py-3 font-medium text-gray-500 text-right">총 결제액</th>
+                  {tab === 'foreign' ? (
+                    <>
+                      <th className="px-5 py-3 font-medium text-gray-500 text-center">통역사</th>
+                      <th className="px-5 py-3 font-medium text-gray-500 text-center">Stripe 결제</th>
+                      <th className="px-5 py-3 font-medium text-gray-500">체류 기간</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-5 py-3 font-medium text-gray-500">마지막 방문일</th>
+                      <th className="px-5 py-3 font-medium text-gray-500 text-right">총 결제액</th>
+                    </>
+                  )}
                   <th className="px-5 py-3 w-10" />
                 </tr>
               </thead>
@@ -331,11 +381,22 @@ export default function Patients() {
                 {visible.map((p) => (
                   <tr key={p.user_id} onClick={() => { if (isFree) { toast('BASIC 플랜 이상에서 사용 가능합니다', 'error'); return; } setSelId(p.user_id); setMemoIn(''); }}
                     className="border-b border-gray-50 last:border-0 hover:bg-blue-50/30 cursor-pointer transition-colors">
-                    <td className="px-5 py-3"><div className="flex items-center gap-2.5"><div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center shrink-0"><span className="text-xs font-medium text-gray-500">{p.name?.charAt(0)}</span></div><span className="font-medium text-gray-900">{p.name}</span></div></td>
+                    <td className="px-5 py-3"><div className="flex items-center gap-2.5"><div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center shrink-0"><span className="text-xs font-medium text-gray-500">{p.preferred_language && p.preferred_language !== 'ko' ? FLAG_EMOJI[p.preferred_language] || p.name?.charAt(0) : p.name?.charAt(0)}</span></div><span className="font-medium text-gray-900">{p.name}</span>{p.preferred_language && p.preferred_language !== 'ko' && <span className="ml-1.5 text-sm">{FLAG_EMOJI[p.preferred_language] || '🌐'}</span>}</div></td>
                     <td className="px-5 py-3 text-gray-600">{fmtPhone(p.phone)}</td>
+                    {tab === 'foreign' && <td className="px-5 py-3 text-center"><span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-700">{LANG_NAME[p.preferred_language || ''] || p.preferred_language || '-'}</span></td>}
                     <td className="px-5 py-3 text-center"><span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">{p.visit_count}</span></td>
-                    <td className="px-5 py-3 text-gray-600">{fmtDate(p.last_visit)}</td>
-                    <td className="px-5 py-3 text-right text-gray-900 font-medium">{fmtMoney(Number(p.total_spent))}</td>
+                    {tab === 'foreign' ? (
+                      <>
+                        <td className="px-5 py-3 text-center">{p.has_interpreter ? <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-green-50 text-green-700">배정완료</span> : <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-500">미배정</span>}</td>
+                        <td className="px-5 py-3 text-center">{p.stripe_paid ? <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">결제완료</span> : <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-yellow-50 text-yellow-700">미결제</span>}</td>
+                        <td className="px-5 py-3 text-gray-600 text-xs">{p.arrival_date && p.departure_date ? `${fmtDate(p.arrival_date)} ~ ${fmtDate(p.departure_date)}` : '-'}</td>
+                      </>
+                    ) : (
+                      <>
+                        <td className="px-5 py-3 text-gray-600">{fmtDate(p.last_visit)}</td>
+                        <td className="px-5 py-3 text-right text-gray-900 font-medium">{fmtMoney(Number(p.total_spent))}</td>
+                      </>
+                    )}
                     <td className="px-5 py-3 text-center"><svg className="w-4 h-4 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg></td>
                   </tr>
                 ))}
@@ -388,6 +449,48 @@ export default function Patients() {
                     ))}
                   </div>
                 </div>
+                {/* 외국인 환자 정보 (preferred_language가 ko가 아닌 경우) */}
+                {detail.preferred_language && detail.preferred_language !== 'ko' && (
+                  <div className="px-6 py-5">
+                    <h4 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">🌍 외국인 환자 정보</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-indigo-50/50 rounded-lg px-3 py-2.5">
+                        <p className="text-[11px] text-gray-400">국적</p>
+                        <p className="text-sm font-bold text-gray-900">{FLAG_EMOJI[detail.nationality || detail.preferred_language] || '🌐'} {detail.nationality || '-'}</p>
+                      </div>
+                      <div className="bg-indigo-50/50 rounded-lg px-3 py-2.5">
+                        <p className="text-[11px] text-gray-400">사용 언어</p>
+                        <p className="text-sm font-bold text-gray-900">{LANG_NAME[detail.preferred_language] || detail.preferred_language}</p>
+                      </div>
+                      <div className="bg-indigo-50/50 rounded-lg px-3 py-2.5">
+                        <p className="text-[11px] text-gray-400">통역사 배정</p>
+                        <p className="text-sm font-bold">{detail.has_interpreter
+                          ? <span className="text-green-600">✅ 배정완료</span>
+                          : <span className="text-yellow-600">⏳ 미배정</span>}</p>
+                      </div>
+                      <div className="bg-indigo-50/50 rounded-lg px-3 py-2.5">
+                        <p className="text-[11px] text-gray-400">Stripe 결제</p>
+                        <p className="text-sm font-bold">{detail.stripe_paid
+                          ? <span className="text-emerald-600">💳 결제완료</span>
+                          : <span className="text-yellow-600">미결제</span>}</p>
+                      </div>
+                    </div>
+                    {/* 체류 기간 */}
+                    {(detail.arrival_date || detail.departure_date) && (
+                      <div className="mt-3 bg-indigo-50/50 rounded-lg px-3 py-2.5">
+                        <p className="text-[11px] text-gray-400">한국 체류 기간</p>
+                        <p className="text-sm font-bold text-gray-900">
+                          ✈️ {fmtDate(detail.arrival_date || null)} ~ {fmtDate(detail.departure_date || null)}
+                          {detail.arrival_date && detail.departure_date && (
+                            <span className="ml-2 text-xs font-normal text-gray-500">
+                              ({Math.ceil((new Date(detail.departure_date).getTime() - new Date(detail.arrival_date).getTime()) / 86400000)}일)
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {/* 시술 이력 */}
                 <div className="px-6 py-5"><h4 className="text-sm font-bold text-gray-900 mb-3">시술 이력</h4><Timeline items={detail.reservations} /></div>
                 {/* 리뷰 */}

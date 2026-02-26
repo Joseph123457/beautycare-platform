@@ -15,13 +15,16 @@ import { useLanguage } from '../context/LanguageContext';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import HomeScreen from '../screens/HomeScreen';
 import HospitalSearchScreen from '../screens/HospitalSearchScreen';
-import TourGuideScreen from '../screens/TourGuideScreen';
+import GuideScreen from '../screens/GuideScreen';
+import GuideDetailScreen from '../screens/GuideDetailScreen';
 import MyReservationsScreen from '../screens/MyReservationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import HospitalDetailScreen from '../screens/HospitalDetailScreen';
 import ReviewListScreen from '../screens/ReviewListScreen';
 import BookingScreen from '../screens/BookingScreen';
 import PaymentScreen from '../screens/PaymentScreen';
+import InterpreterScreen from '../screens/InterpreterScreen';
+import RecoveryHouseScreen from '../screens/RecoveryHouseScreen';
 
 import { RootStackParamList, TabParamList } from '../types';
 
@@ -75,7 +78,7 @@ function MainTabs() {
       />
       <Tab.Screen
         name="TourGuide"
-        component={TourGuideScreen}
+        component={GuideScreen}
         options={{ tabBarLabel: t('common.tourGuide') }}
       />
       <Tab.Screen
@@ -142,6 +145,21 @@ export default function RootNavigator() {
         name="Payment"
         component={PaymentScreen}
         options={{ title: t('payment.title') }}
+      />
+      <Stack.Screen
+        name="Interpreter"
+        component={InterpreterScreen}
+        options={{ title: t('interpreter.title') }}
+      />
+      <Stack.Screen
+        name="GuideDetail"
+        component={GuideDetailScreen}
+        options={{ title: t('guide.articleDetail') }}
+      />
+      <Stack.Screen
+        name="RecoveryHouse"
+        component={RecoveryHouseScreen}
+        options={{ title: t('recoveryHouse.title') }}
       />
       <Stack.Screen
         name="Map"

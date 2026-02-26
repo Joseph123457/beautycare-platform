@@ -20,6 +20,8 @@ const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
 const stripePaymentRoutes = require('./routes/stripePayments');
 const exchangeRateRoutes = require('./routes/exchangeRates');
+const interpreterRoutes = require('./routes/interpreters');
+const guideRoutes = require('./routes/guide');
 
 // 다국어 미들웨어
 const i18nMiddleware = require('./middlewares/i18n');
@@ -70,6 +72,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/payments/stripe', stripePaymentRoutes);
 app.use('/api/exchange-rates', exchangeRateRoutes);
+app.use('/api/interpreters', interpreterRoutes);
+app.use('/api/admin/interpreters', interpreterRoutes.adminRouter);
+app.use('/api/guide', guideRoutes);
 
 // 404 처리
 app.use((req, res) => {

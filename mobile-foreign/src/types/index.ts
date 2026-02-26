@@ -107,6 +107,41 @@ export interface Review {
   is_foreign?: boolean;
 }
 
+// ─── 통역사 ────────────────────────────────────────────
+
+export interface InterpreterProfile {
+  interpreter_id: number;
+  name: string;
+  languages: string[];
+  available_type: 'PHONE' | 'VISIT' | 'BOTH';
+  hourly_rate: number;
+  rating: number;
+  review_count: number;
+}
+
+export type InterpretationBookingStatus = 'PENDING' | 'CONFIRMED' | 'DONE' | 'CANCELLED';
+
+export interface InterpretationBooking {
+  booking_id: number;
+  reservation_id: number;
+  interpreter_id: number;
+  user_id: number;
+  type: 'PHONE' | 'VISIT';
+  scheduled_at: string;
+  duration_hours: number;
+  total_fee: number;
+  status: InterpretationBookingStatus;
+  interpreter_name?: string;
+  hospital_name?: string;
+  payment?: {
+    client_secret: string;
+    payment_intent_id: string;
+    fee_krw: number;
+    fee_foreign: number;
+    currency: string;
+  } | null;
+}
+
 // ─── 네비게이션 파라미터 ───────────────────────────────
 
 export type RootStackParamList = {
@@ -122,6 +157,9 @@ export type RootStackParamList = {
     reservedAt: string;
     depositKrw: number;
   };
+  Interpreter: { reservationId: number; hospitalName: string };
+  GuideDetail: { articleId: number };
+  RecoveryHouse: undefined;
   Map: { lat: number; lng: number; category?: string };
 };
 

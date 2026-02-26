@@ -16,7 +16,46 @@ interface ChatRoom {
   user_unread_count: number;
   hospital_unread_count: number;
   hospital_online?: boolean;
+  // 외국인 환자 정보
+  preferred_language?: string;
 }
+
+// 국기 이모지 매핑
+const FLAG_EMOJI: Record<string, string> = {
+  en: '🇺🇸', ja: '🇯🇵', zh: '🇨🇳',
+};
+
+// 다국어 빠른 답변 템플릿
+const QUICK_REPLIES = [
+  {
+    label: '예약 확정',
+    ko: '예약이 확정되었습니다.',
+    en: 'Your reservation has been confirmed.',
+    ja: 'ご予約が確定しました。',
+    zh: '您的预约已确认。',
+  },
+  {
+    label: '회복 기간',
+    ko: '이 시술의 회복 기간은 약 7일입니다.',
+    en: 'The recovery period for this procedure is approximately 7 days.',
+    ja: 'この施術の回復期間は約7日です。',
+    zh: '此手术的恢复期约为7天。',
+  },
+  {
+    label: '금식 안내',
+    ko: '시술 전 금식이 필요합니다.',
+    en: 'Fasting is required before the procedure.',
+    ja: '施術前の絶食が必要です。',
+    zh: '手术前需要禁食。',
+  },
+  {
+    label: '통역사 배정',
+    ko: '통역사를 배정해드리겠습니다.',
+    en: 'We will assign an interpreter for you.',
+    ja: '通訳者を手配いたします。',
+    zh: '我们将为您安排翻译。',
+  },
+];
 
 interface Message {
   message_id: number;
@@ -153,6 +192,12 @@ export default function Chats() {
 
   // 이미지 확대
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+
+  // 번역 상태 (message_id → 번역 텍스트)
+  const [translations, setTranslations] = useState<Record<number, string>>({});
+  const [translating, setTranslating] = useState<Record<number, boolean>>({});
+  // 빠른 답변 패널
+  const [showQuickReply, setShowQuickReply] = useState(false);
 
   // 소켓
   const socketRef = useRef<Socket | null>(null);
@@ -317,6 +362,23 @@ export default function Chats() {
     loadMessages(selectedRoomId, nextPage);
   }, [hasMore, messagesLoading, selectedRoomId, page, loadMessages]);
 
+  // ─── 메시지 번역 (DeepL API) ───────────────────────────
+
+  const translateMessage = useCallback(async (messageId: number, roomId: number, text: string) => {
+    if (translations[messageId]) return; // 이미 번역됨
+    setTranslating((prev) => ({ ...prev, [messageId]: true }));
+    try {
+      const { data } = await client.post(`/chats/${roomId}/translate`, { text, targetLang: 'ko' });
+      if (data.success && data.data?.translated) {
+        setTranslations((prev) => ({ ...prev, [messageId]: data.data.translated }));
+      }
+    } catch {
+      // 번역 실패 시 무시
+    } finally {
+      setTranslating((prev) => ({ ...prev, [messageId]: false }));
+    }
+  }, [translations]);
+
   // ─── 메시지 전송 ──────────────────────────────────────
 
   const sendMessage = useCallback(() => {
@@ -439,6 +501,8 @@ export default function Chats() {
               filteredRooms.map((room) => {
                 const isSelected = room.room_id === selectedRoomId;
                 const unread = room.hospital_unread_count;
+                const isForeign = room.preferred_language && room.preferred_language !== 'ko';
+                const flag = isForeign ? (FLAG_EMOJI[room.preferred_language!] || '🌐') : '';
                 const userName = room.user_name || `환자 #${room.user_id}`;
 
                 return (
@@ -468,7 +532,7 @@ export default function Chats() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className={`text-sm truncate ${unread > 0 ? 'font-bold text-gray-900' : 'font-medium text-gray-700'}`}>
-                          {userName}
+                          {flag && <span className="mr-1">{flag}</span>}{userName}
                         </span>
                         <span className="text-[11px] text-gray-400 shrink-0 ml-2">
                           {formatRelativeTime(room.last_message_at)}
@@ -609,7 +673,15 @@ export default function Chats() {
                             )}
                           </div>
 
-                          {/* 시간 + 읽음 */}
+                          {/* 번역 결과 표시 */}
+                          {!isMine && translations[msg.message_id] && (
+                            <div className="mt-1.5 pt-1.5 border-t border-gray-200/50">
+                              <p className="text-[11px] text-gray-400 mb-0.5">🇰🇷 번역</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{translations[msg.message_id]}</p>
+                            </div>
+                          )}
+
+                          {/* 시간 + 읽음 + 번역 버튼 */}
                           <div className={`flex items-center gap-1 mt-1 ${isMine ? 'justify-end' : 'justify-start'}`}>
                             {isMine && msg.is_read && (
                               <span className="text-[10px] text-[#1E5FA8] font-medium">읽음</span>
@@ -617,6 +689,16 @@ export default function Chats() {
                             <span className="text-[10px] text-gray-400">
                               {formatTime(msg.created_at)}
                             </span>
+                            {/* 외국인 메시지: 번역 보기 버튼 */}
+                            {!isMine && msg.content && selectedRoom?.preferred_language && selectedRoom.preferred_language !== 'ko' && !translations[msg.message_id] && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); translateMessage(msg.message_id, msg.room_id, msg.content!); }}
+                                disabled={translating[msg.message_id]}
+                                className="ml-1 text-[10px] text-[#1E5FA8] hover:underline disabled:opacity-50"
+                              >
+                                {translating[msg.message_id] ? '번역 중...' : '번역 보기'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -625,6 +707,36 @@ export default function Chats() {
                 })}
                 <div ref={messagesEndRef} />
               </div>
+
+              {/* 빠른 답변 템플릿 (외국인 채팅일 때 표시) */}
+              {selectedRoom?.preferred_language && selectedRoom.preferred_language !== 'ko' && (
+                <div className="px-4 py-2 border-t border-gray-100 bg-gray-50/50 shrink-0">
+                  <button
+                    onClick={() => setShowQuickReply(!showQuickReply)}
+                    className="text-xs text-[#1E5FA8] font-medium hover:underline flex items-center gap-1"
+                  >
+                    ⚡ 자주 쓰는 답변 {showQuickReply ? '▲' : '▼'}
+                  </button>
+                  {showQuickReply && (
+                    <div className="mt-2 grid grid-cols-2 gap-1.5">
+                      {QUICK_REPLIES.map((tpl) => {
+                        const lang = selectedRoom.preferred_language as keyof typeof tpl;
+                        const foreignText = tpl[lang] || tpl.en;
+                        return (
+                          <button
+                            key={tpl.label}
+                            onClick={() => { setInputText(`${tpl.ko}\n\n${foreignText}`); setShowQuickReply(false); }}
+                            className="text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 hover:border-[#1E5FA8]/30 transition-colors"
+                          >
+                            <p className="text-xs font-medium text-gray-800">{tpl.ko}</p>
+                            <p className="text-[11px] text-gray-400 mt-0.5">{foreignText}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* 입력 영역 */}
               <div className="px-4 py-3 border-t border-gray-200 bg-white shrink-0">

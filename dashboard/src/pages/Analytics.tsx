@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Cell,
+  PieChart, Pie,
 } from 'recharts';
 import client from '../api/client';
 import { useAuth } from '../hooks/useAuth';
@@ -87,6 +88,17 @@ interface ExposureData {
     completionRate: number;
   };
 }
+
+// ─── 외국인 통계 타입 ──────────────────────────────────
+
+interface ForeignStats {
+  nationalityDistribution: { country: string; count: number; flag: string }[];
+  monthlyTrend: { month: string; count: number }[];
+  depositCollectionRate: number;
+  totalForeignPatients: number;
+}
+
+const NATIONALITY_COLORS = ['#1E5FA8', '#E8772E', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280'];
 
 // ─── 기간 탭 옵션 ─────────────────────────────────────
 const PERIOD_OPTIONS: { value: Period; label: string }[] = [
@@ -220,22 +232,25 @@ export default function Analytics() {
   const [treatments, setTreatments] = useState<TreatmentsData | null>(null);
   const [timeData, setTimeData] = useState<TimeData | null>(null);
   const [exposure, setExposure] = useState<ExposureData | null>(null);
+  const [foreignStats, setForeignStats] = useState<ForeignStats | null>(null);
 
   // ── 데이터 로드 ──
   const loadAnalytics = useCallback(async () => {
     if (!hospitalId) return;
     setLoading(true);
     try {
-      const [ovRes, trRes, tmRes, exRes] = await Promise.all([
+      const [ovRes, trRes, tmRes, exRes, fgRes] = await Promise.all([
         client.get(`/analytics/overview/${hospitalId}`, { params: { period } }),
         client.get(`/analytics/treatments/${hospitalId}`, { params: { period } }),
         client.get(`/analytics/time/${hospitalId}`, { params: { period } }),
         client.get(`/analytics/exposure/${hospitalId}`),
+        client.get(`/analytics/foreign/${hospitalId}`, { params: { period } }).catch(() => ({ data: { data: null } })),
       ]);
       setOverview(ovRes.data.data);
       setTreatments(trRes.data.data);
       setTimeData(tmRes.data.data);
       setExposure(exRes.data.data);
+      setForeignStats(fgRes.data.data);
     } catch {
       // API 에러 시 기본값 유지
     } finally {
@@ -778,6 +793,156 @@ export default function Analytics() {
               <span>완료율 {exposure.conversionFunnel.completionRate}%</span>
             </div>
           </div>
+        </div>
+      ) : null}
+
+      {/* ── 6. 외국인 환자 통계 ── */}
+      {loading ? (
+        <ChartSkeleton />
+      ) : foreignStats && foreignStats.totalForeignPatients > 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              🌍 외국인 환자 통계
+            </h3>
+            <span className="text-xs text-gray-400">
+              총 {foreignStats.totalForeignPatients}명
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 왼쪽: 국적 분포 파이 차트 */}
+            <div>
+              <p className="text-xs text-gray-500 font-medium mb-3">국적 분포</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={foreignStats.nationalityDistribution}
+                    dataKey="count"
+                    nameKey="country"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    innerRadius={40}
+                    label={({ country, percent }: { country: string; percent: number }) =>
+                      `${country} ${(percent * 100).toFixed(0)}%`
+                    }
+                    labelLine={false}
+                  >
+                    {foreignStats.nationalityDistribution.map((_, idx) => (
+                      <Cell key={idx} fill={NATIONALITY_COLORS[idx % NATIONALITY_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
+                    formatter={(value: number) => [`${value}명`, '환자 수']}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              {/* 범례 */}
+              <div className="flex flex-wrap gap-2 mt-2 justify-center">
+                {foreignStats.nationalityDistribution.map((item, idx) => (
+                  <div key={item.country} className="flex items-center gap-1.5 text-xs">
+                    <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: NATIONALITY_COLORS[idx % NATIONALITY_COLORS.length] }} />
+                    <span className="text-gray-600">{item.flag} {item.country}</span>
+                    <span className="text-gray-400">({item.count})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 중간: 월별 외국인 환자 수 추이 */}
+            <div>
+              <p className="text-xs text-gray-500 font-medium mb-3">월별 외국인 환자 수</p>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={foreignStats.monthlyTrend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 11, fill: '#9CA3AF' }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v: string) => v.slice(5)}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: '#9CA3AF' }}
+                    axisLine={false}
+                    tickLine={false}
+                    width={30}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
+                    formatter={(value: number) => [`${value}명`, '외국인 환자']}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {foreignStats.monthlyTrend.map((_, idx) => (
+                      <Cell key={idx} fill={idx === foreignStats.monthlyTrend.length - 1 ? '#E8772E' : '#E8772Eaa'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 오른쪽: 평균 예약금 회수율 + 요약 */}
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-gray-500 font-medium mb-3">예약금 회수율 (Stripe)</p>
+                <div className="flex flex-col items-center">
+                  <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="45" fill="none" stroke="#f3f4f6" strokeWidth="10" />
+                    <circle
+                      cx="60" cy="60" r="45" fill="none"
+                      stroke="#E8772E" strokeWidth="10"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 45}`}
+                      strokeDashoffset={`${2 * Math.PI * 45 - (foreignStats.depositCollectionRate / 100) * 2 * Math.PI * 45}`}
+                      transform="rotate(-90 60 60)"
+                      className="transition-all duration-700"
+                    />
+                    <text x="60" y="55" textAnchor="middle" fill="#E8772E" fontSize="28" fontWeight="bold">
+                      {foreignStats.depositCollectionRate}
+                    </text>
+                    <text x="60" y="75" textAnchor="middle" fill="#9CA3AF" fontSize="11">
+                      %
+                    </text>
+                  </svg>
+                </div>
+              </div>
+
+              {/* 국가별 순위 리스트 */}
+              <div>
+                <p className="text-xs text-gray-500 font-medium mb-2">국가별 환자 수</p>
+                <div className="space-y-1.5">
+                  {foreignStats.nationalityDistribution.slice(0, 5).map((item, idx) => (
+                    <div key={item.country} className="flex items-center justify-between text-xs py-1 border-b border-gray-50 last:border-0">
+                      <span className="text-gray-700">
+                        <span className="mr-1">{item.flag}</span>
+                        {item.country}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${(item.count / foreignStats.totalForeignPatients) * 100}%`,
+                              backgroundColor: NATIONALITY_COLORS[idx % NATIONALITY_COLORS.length],
+                            }}
+                          />
+                        </div>
+                        <span className="text-gray-500 w-8 text-right">{item.count}명</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : !loading && foreignStats?.totalForeignPatients === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">🌍 외국인 환자 통계</h3>
+          <p className="text-sm text-gray-400">해당 기간에 외국인 환자 데이터가 없습니다</p>
         </div>
       ) : null}
     </div>
