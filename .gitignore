@@ -5,3 +5,7 @@ node_modules/
 dist/
 .expo/
 *.log
+
+# Claude Code / OMC 로컬 설정
+.claude/
+.omc/

@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-24T07:03:59.050Z",
+  "lastUpdated": "2026-02-24T14:01:54.979Z",
   "activeFeatures": [
     "config",
     "backend",
@@ -12,7 +12,8 @@
     "context",
     "navigation",
     "screens",
-    "tests"
+    "tests",
+    "socket"
   ],
   "primaryFeature": "config",
   "features": {
@@ -25,9 +26,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T04:20:31.456Z",
-        "lastUpdated": "2026-02-24T07:02:16.541Z"
+        "lastUpdated": "2026-02-24T12:54:27.248Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\config\\database.js"
+      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\config\\env.js"
     },
     "backend": {
       "phase": "do",
@@ -38,9 +39,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T04:20:41.774Z",
-        "lastUpdated": "2026-02-24T07:02:32.728Z"
+        "lastUpdated": "2026-02-24T13:29:31.081Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\backend\\jest.config.js"
+      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\app.js"
     },
     "middlewares": {
       "phase": "do",
@@ -51,9 +52,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T04:20:57.730Z",
-        "lastUpdated": "2026-02-24T05:03:44.434Z"
+        "lastUpdated": "2026-02-24T07:28:36.295Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\middlewares\\auth.js"
+      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\middlewares\\subscription.js"
     },
     "routes": {
       "phase": "do",
@@ -64,9 +65,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T04:22:20.367Z",
-        "lastUpdated": "2026-02-24T05:47:40.855Z"
+        "lastUpdated": "2026-02-24T13:29:17.790Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\routes\\hospitals.js"
+      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\routes\\patients.js"
     },
     "dashboard": {
       "phase": "do",
@@ -77,9 +78,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T05:15:42.324Z",
-        "lastUpdated": "2026-02-24T05:49:05.601Z"
+        "lastUpdated": "2026-02-24T14:01:54.979Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\dashboard\\src\\pages\\Reviews.tsx"
+      "lastFile": "C:\\projects\\beautycare-platform\\dashboard\\src\\components\\Layout.tsx"
     },
     "api": {
       "phase": "do",
@@ -103,9 +104,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T06:29:00.618Z",
-        "lastUpdated": "2026-02-24T06:49:04.959Z"
+        "lastUpdated": "2026-02-24T13:13:10.117Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\types\\index.ts"
+      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\hooks\\usePushNotifications.ts"
     },
     "context": {
       "phase": "do",
@@ -116,9 +117,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T06:29:15.586Z",
-        "lastUpdated": "2026-02-24T06:29:15.586Z"
+        "lastUpdated": "2026-02-24T11:54:28.047Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\context\\AuthContext.tsx"
+      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\context\\SocketContext.tsx"
     },
     "navigation": {
       "phase": "do",
@@ -129,7 +130,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T06:29:34.165Z",
-        "lastUpdated": "2026-02-24T06:41:29.090Z"
+        "lastUpdated": "2026-02-24T13:12:42.378Z"
       },
       "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\navigation\\index.tsx"
     },
@@ -142,9 +143,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-24T06:30:07.172Z",
-        "lastUpdated": "2026-02-24T06:51:13.030Z"
+        "lastUpdated": "2026-02-24T13:12:35.327Z"
       },
-      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\screens\\BookingScreen.tsx"
+      "lastFile": "C:\\projects\\beautycare-platform\\mobile\\src\\screens\\ReviewWriteScreen.tsx"
     },
     "tests": {
       "phase": "do",
@@ -158,6 +159,19 @@
         "lastUpdated": "2026-02-24T07:03:59.050Z"
       },
       "lastFile": "C:\\projects\\beautycare-platform\\backend\\tests\\reviews.test.js"
+    },
+    "socket": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-24T11:41:39.881Z",
+        "lastUpdated": "2026-02-24T11:41:39.881Z"
+      },
+      "lastFile": "C:\\projects\\beautycare-platform\\backend\\src\\socket\\chat.js"
     }
   },
   "pipeline": {
@@ -168,7 +182,7 @@
   "session": {
     "startedAt": "2026-02-24T04:12:31.957Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-24T07:03:59.050Z"
+    "lastActivity": "2026-02-24T14:01:54.979Z"
   },
   "history": [
     {
@@ -810,6 +824,504 @@
     {
       "timestamp": "2026-02-24T07:03:59.050Z",
       "feature": "tests",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:27:06.383Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:27:12.521Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:11.729Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:26.144Z",
+      "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:36.295Z",
+      "feature": "middlewares",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:41.732Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:45.491Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:28:50.136Z",
+      "feature": "config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:29:04.921Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T07:29:08.988Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:37:06.377Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:37:11.330Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:37:15.822Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:37:26.571Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:41:05.565Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:41:39.881Z",
+      "feature": "socket",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:42:05.021Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:42:09.908Z",
+      "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:42:15.142Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:42:19.256Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:42:27.973Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:54:28.047Z",
+      "feature": "context",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:55:02.754Z",
+      "feature": "screens",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:00.321Z",
+      "feature": "screens",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:07.696Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:13.381Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:29.035Z",
+      "feature": "navigation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:37.266Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T11:56:41.606Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:02:21.565Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:02:26.781Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:02:27.798Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:02:35.506Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:19:56.520Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:12.879Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:16.154Z",
+      "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:24.512Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:27.731Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:28.936Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:29.845Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:31.504Z",
+      "feature": "config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:39.153Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:20:45.908Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:42:23.935Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:42:40.974Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:42:56.140Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:43:14.139Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:43:19.124Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:43:38.324Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:45:36.396Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:50:12.406Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:50:21.665Z",
+      "feature": "config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:51:09.622Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:51:20.363Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:51:31.231Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:54:27.248Z",
+      "feature": "config",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:54:34.701Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:54:40.475Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:55:39.792Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:55:49.981Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T12:55:53.838Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:09:16.475Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:09:55.444Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:08.187Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:12.363Z",
+      "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:16.694Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:17.590Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:35.327Z",
+      "feature": "screens",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:40.308Z",
+      "feature": "navigation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:42.378Z",
+      "feature": "navigation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:49.147Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:12:57.358Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:13:10.117Z",
+      "feature": "mobile",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:28:35.945Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:29:01.168Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:29:17.790Z",
+      "feature": "routes",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:29:27.383Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:29:31.081Z",
+      "feature": "backend",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T13:51:56.286Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T14:01:23.750Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T14:01:35.656Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T14:01:40.271Z",
+      "feature": "dashboard",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-24T14:01:54.979Z",
+      "feature": "dashboard",
       "phase": "do",
       "action": "updated"
     }
