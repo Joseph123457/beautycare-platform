@@ -26,6 +26,7 @@ const {
   getCategories,
   translateHospital,
   translateTreatment,
+  certifyForeignFriendly,
 } = require('../controllers/hospitals');
 
 // 기존 CRUD 컨트롤러
@@ -92,6 +93,10 @@ router.put('/:id', authMiddleware, updateHospital);
 
 // DELETE /api/hospitals/:id — 병원 삭제
 router.delete('/:id', authMiddleware, deleteHospital);
+
+// ─── 외국인 친화 인증 라우트 (인증 필요) ──────────────
+// POST /api/hospitals/:id/foreign-certification — 외국인 친화 병원 인증 신청
+router.post('/:id/foreign-certification', authMiddleware, certifyForeignFriendly);
 
 // ─── 번역 라우트 (인증 필요) ─────────────────────────
 

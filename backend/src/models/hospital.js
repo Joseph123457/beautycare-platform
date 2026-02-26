@@ -13,7 +13,9 @@ const Hospital = {
   findAll: async (limit = 20, offset = 0) => {
     const result = await pool.query(
       `SELECT hospital_id, name, address, category, lat, lng,
-              avg_rating, review_count, created_at
+              avg_rating, review_count, created_at,
+              foreign_friendly, languages_supported, has_interpreter,
+              accepts_foreign_insurance, foreign_patient_ratio
        FROM hospitals
        ORDER BY created_at DESC
        LIMIT $1 OFFSET $2`,
@@ -53,17 +55,26 @@ const Hospital = {
    * @param {number} id - 병원 ID (hospital_id)
    * @param {object} data - 수정할 정보
    */
-  update: async (id, { name, address, category, description }) => {
+  update: async (id, { name, address, category, description,
+    foreign_friendly, languages_supported, has_interpreter,
+    accepts_foreign_insurance, foreign_patient_ratio }) => {
     const result = await pool.query(
       `UPDATE hospitals
        SET name = COALESCE($1, name),
            address = COALESCE($2, address),
            category = COALESCE($3, category),
            description = COALESCE($4, description),
+           foreign_friendly = COALESCE($5, foreign_friendly),
+           languages_supported = COALESCE($6, languages_supported),
+           has_interpreter = COALESCE($7, has_interpreter),
+           accepts_foreign_insurance = COALESCE($8, accepts_foreign_insurance),
+           foreign_patient_ratio = COALESCE($9, foreign_patient_ratio),
            updated_at = NOW()
-       WHERE hospital_id = $5
+       WHERE hospital_id = $10
        RETURNING *`,
-      [name, address, category, description, id]
+      [name, address, category, description,
+       foreign_friendly, languages_supported, has_interpreter,
+       accepts_foreign_insurance, foreign_patient_ratio, id]
     );
     return result.rows[0] || null;
   },

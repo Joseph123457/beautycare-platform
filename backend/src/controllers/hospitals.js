@@ -25,6 +25,7 @@ const WEIGHT = {
   PROFILE: 10,      // 프로필 완성도 (10%)
   DISTANCE: 20,     // 거리 근접도 (20%)
   RANDOM: 20,       // 랜덤 부스트 (20%)
+  FOREIGN_BONUS: 5, // 외국인 친화 인증 보너스 (가산점)
 };
 
 /** 다국어 지원 언어 목록 */
@@ -143,6 +144,7 @@ const searchHospitals = async (req, res, next) => {
 
     const radius = parseFloat(req.query.radius) || 5;
     const category = req.query.category || null;
+    const foreignOnly = req.query.foreign_only === 'true';
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
     const offset = (page - 1) * limit;
@@ -172,12 +174,24 @@ const searchHospitals = async (req, res, next) => {
       + (h.profile_score / 100.0 * ${WEIGHT.PROFILE})
       + (${distanceScoreSQL} * ${WEIGHT.DISTANCE})
       + (random() * ${WEIGHT.RANDOM})
+      + (CASE WHEN h.foreign_friendly = true THEN ${WEIGHT.FOREIGN_BONUS} ELSE 0 END)
     `;
 
-    // ── 카테고리 필터 조건 ──
-    const categoryFilter = category ? 'AND h.category = $4' : '';
+    // ── 필터 조건 (카테고리 + 외국인 전용) ──
+    let filterIdx = 4;
+    const filters = [];
     const params = [lat, lng, radius];
-    if (category) params.push(category);
+
+    if (category) {
+      filters.push(`AND h.category = $${filterIdx}`);
+      params.push(category);
+      filterIdx++;
+    }
+    if (foreignOnly) {
+      filters.push('AND h.foreign_friendly = true');
+    }
+
+    const categoryFilter = filters.join(' ');
 
     // ── 전체 건수 조회 ──
     const countQuery = `
@@ -212,6 +226,10 @@ const searchHospitals = async (req, res, next) => {
         h.profile_score,
         h.subscription_tier,
         h.is_verified,
+        h.foreign_friendly,
+        h.languages_supported,
+        h.has_interpreter,
+        h.accepts_foreign_insurance,
 
         -- 거리 (km, 소수점 2자리)
         ROUND(${haversineSQL}::numeric, 2) AS distance_km,
@@ -624,10 +642,115 @@ const translateTreatment = async (req, res, next) => {
   }
 };
 
+// ─── 5. 외국인 친화 병원 인증 ──────────────────────────
+
+/**
+ * POST /api/hospitals/:id/foreign-certification
+ *
+ * 병원 소유자가 외국인 친화 인증을 신청한다.
+ * 3가지 조건을 자동 검증하여 모두 충족 시 인증 처리:
+ *   1) 영문 병원 정보 존재 (name_en)
+ *   2) 외국인 환자 5명 이상
+ *   3) 영문 리뷰 3개 이상
+ */
+const certifyForeignFriendly = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // 병원 존재 + 소유자 확인
+    const hospitalResult = await pool.query(
+      'SELECT * FROM hospitals WHERE hospital_id = $1',
+      [id]
+    );
+
+    if (hospitalResult.rows.length === 0) {
+      return errorResponse(res, req.t('errors:hospital.notFound'), 404);
+    }
+
+    const hospital = hospitalResult.rows[0];
+    if (hospital.owner_user_id !== req.user.id) {
+      return errorResponse(res, req.t('errors:hospital.notOwner'), 403);
+    }
+
+    // ── 조건 1: 영문 병원 정보 존재 ──
+    const hasEnglishInfo = !!(hospital.name_en && hospital.name_en.trim() !== '');
+
+    // ── 조건 2: 외국인 환자 5명 이상 ──
+    const foreignPatientResult = await pool.query(
+      `SELECT COUNT(DISTINCT r.user_id) AS cnt
+       FROM reservations r
+       JOIN users u ON u.user_id = r.user_id
+       WHERE r.hospital_id = $1
+         AND u.nationality IS NOT NULL
+         AND u.nationality != 'KR'`,
+      [id]
+    );
+    const foreignPatientCount = parseInt(foreignPatientResult.rows[0].cnt, 10);
+    const hasForeignPatients = foreignPatientCount >= 5;
+
+    // ── 조건 3: 영문 리뷰 3개 이상 ──
+    const englishReviewResult = await pool.query(
+      `SELECT COUNT(*) AS cnt
+       FROM reviews
+       WHERE hospital_id = $1
+         AND language = 'en'`,
+      [id]
+    );
+    const englishReviewCount = parseInt(englishReviewResult.rows[0].cnt, 10);
+    const hasEnglishReviews = englishReviewCount >= 3;
+
+    // ── 체크리스트 구성 ──
+    const checklist = {
+      hasEnglishInfo: {
+        met: hasEnglishInfo,
+        label: '영문 병원 정보',
+      },
+      hasForeignPatients: {
+        met: hasForeignPatients,
+        current: foreignPatientCount,
+        required: 5,
+        label: '외국인 환자 5명 이상',
+      },
+      hasEnglishReviews: {
+        met: hasEnglishReviews,
+        current: englishReviewCount,
+        required: 3,
+        label: '영문 리뷰 3개 이상',
+      },
+    };
+
+    const allMet = hasEnglishInfo && hasForeignPatients && hasEnglishReviews;
+
+    // 모든 조건 충족 시 인증 처리
+    if (allMet) {
+      await pool.query(
+        `UPDATE hospitals
+         SET foreign_friendly = true, updated_at = NOW()
+         WHERE hospital_id = $1`,
+        [id]
+      );
+    }
+
+    return res.json({
+      success: allMet,
+      data: {
+        certified: allMet,
+        checklist,
+      },
+      message: allMet
+        ? '외국인 친화 병원 인증이 완료되었습니다'
+        : '인증 조건을 모두 충족해야 합니다',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   searchHospitals,
   getHospitalDetail,
   getCategories,
   translateHospital,
   translateTreatment,
+  certifyForeignFriendly,
 };
