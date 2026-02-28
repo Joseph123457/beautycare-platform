@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 interface LayoutProps {
   userName: string;
+  userRole?: string;
   onLogout: () => void;
 }
 
@@ -87,7 +88,7 @@ const menuItems = [
  * - 데스크탑: 고정 사이드바 (w-60)
  * - 모바일: 햄버거 메뉴로 열림/닫힘
  */
-export default function Layout({ userName, onLogout }: LayoutProps) {
+export default function Layout({ userName, userRole, onLogout }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -102,6 +103,59 @@ export default function Layout({ userName, onLogout }: LayoutProps) {
         ? 'bg-white/15 text-white'
         : 'text-white/60 hover:bg-white/10 hover:text-white'
     }`;
+
+  // 역할 기반 추가 메뉴 항목 구성
+  const roleMenuItems = useMemo(() => {
+    const items: typeof menuItems = [];
+
+    // HOSPITAL_ADMIN 이상: 콘텐츠 관리
+    if (userRole === 'HOSPITAL_ADMIN' || userRole === 'SUPER_ADMIN') {
+      items.push({
+        to: '/contents',
+        label: '콘텐츠 관리',
+        icon: (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        ),
+      });
+    }
+
+    // SUPER_ADMIN 전용 메뉴
+    if (userRole === 'SUPER_ADMIN') {
+      items.push(
+        {
+          to: '/admin/hospitals',
+          label: '병원 관리',
+          icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+            </svg>
+          ),
+        },
+        {
+          to: '/admin/users',
+          label: '사용자 관리',
+          icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          ),
+        },
+        {
+          to: '/admin/approval',
+          label: '콘텐츠 승인',
+          icon: (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          ),
+        }
+      );
+    }
+
+    return items;
+  }, [userRole]);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -147,6 +201,24 @@ export default function Layout({ userName, onLogout }: LayoutProps) {
               {item.label}
             </NavLink>
           ))}
+
+          {/* 역할 기반 추가 메뉴 (구분선 포함) */}
+          {roleMenuItems.length > 0 && (
+            <>
+              <div className="my-2 border-t border-white/15" />
+              {roleMenuItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={linkClass}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  {item.icon}
+                  {item.label}
+                </NavLink>
+              ))}
+            </>
+          )}
         </nav>
 
         {/* 하단: 사용자 정보 + 로그아웃 */}

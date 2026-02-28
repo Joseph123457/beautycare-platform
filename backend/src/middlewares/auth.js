@@ -30,10 +30,11 @@ const authMiddleware = (req, res, next) => {
       return errorResponse(res, '유효하지 않은 토큰 타입입니다', 401);
     }
 
-    // req.user에 사용자 정보 주입
+    // req.user에 사용자 정보 주입 (역할 포함)
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      role: decoded.role,
     };
 
     next();

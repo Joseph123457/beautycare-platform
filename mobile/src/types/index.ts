@@ -76,6 +76,25 @@ export interface Review {
   author_name: string;
 }
 
+// ─── 피드 콘텐츠 ────────────────────────────────────────
+
+export interface FeedContent {
+  content_id: number;
+  hospital_id: number;
+  hospital_name: string;
+  category: string;
+  photo_urls: string[];
+  description: string;
+  pricing_info: string;
+  tags: string[];
+  lat: number;
+  lng: number;
+  view_count: number;
+  like_count: number;
+  is_favorite?: boolean;
+  created_at: string;
+}
+
 // ─── 네비게이션 파라미터 ───────────────────────────────
 
 export type RootStackParamList = {
@@ -86,12 +105,14 @@ export type RootStackParamList = {
   Booking: { hospitalId: number; hospitalName: string };
   Map: { lat: number; lng: number; category?: string };
   ChatRoom: { roomId: number; hospitalName: string };
+  ContentDetail: { contentId: number };
+  Favorites: undefined;
+  Signup: undefined;
 };
 
 export type TabParamList = {
-  Home: undefined;
+  Feed: undefined;
   Search: undefined;
   Chat: undefined;
-  MyReservations: undefined;
   Profile: undefined;
 };

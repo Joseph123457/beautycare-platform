@@ -3,6 +3,7 @@
  * 미들웨어 등록, 라우트 마운트, 에러 핸들러 연결을 담당한다.
  */
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -22,6 +23,9 @@ const stripePaymentRoutes = require('./routes/stripePayments');
 const exchangeRateRoutes = require('./routes/exchangeRates');
 const interpreterRoutes = require('./routes/interpreters');
 const guideRoutes = require('./routes/guide');
+const feedRoutes = require('./routes/feed');
+const favoritesRoutes = require('./routes/favorites');
+const adminRoutes = require('./routes/admin');
 
 // 다국어 미들웨어
 const i18nMiddleware = require('./middlewares/i18n');
@@ -51,6 +55,9 @@ app.use(express.json());
 // URL-encoded 요청 본문 파싱
 app.use(express.urlencoded({ extended: true }));
 
+// 업로드 파일 정적 서빙
+app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+
 // 다국어 처리 (Accept-Language 감지 → req.language, req.t 주입)
 app.use(i18nMiddleware);
 
@@ -75,6 +82,9 @@ app.use('/api/exchange-rates', exchangeRateRoutes);
 app.use('/api/interpreters', interpreterRoutes);
 app.use('/api/admin/interpreters', interpreterRoutes.adminRouter);
 app.use('/api/guide', guideRoutes);
+app.use('/api/feed', feedRoutes);
+app.use('/api/favorites', favoritesRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 처리
 app.use((req, res) => {

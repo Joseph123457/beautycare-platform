@@ -8,9 +8,15 @@ import {
   TextInput, Alert, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
+import { RootStackParamList } from '../types';
+
+type Nav = StackNavigationProp<RootStackParamList>;
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<Nav>();
   const { user, loading, login, logout } = useAuth();
 
   // 로그인 폼 상태
@@ -92,6 +98,15 @@ export default function ProfileScreen() {
               <Text style={styles.loginBtnText}>로그인</Text>
             )}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.signupLink}
+            onPress={() => navigation.navigate('Signup')}
+          >
+            <Text style={styles.signupLinkText}>
+              계정이 없으신가요? <Text style={{ color: '#1E5FA8', fontWeight: '600' }}>회원가입</Text>
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     );
@@ -101,7 +116,7 @@ export default function ProfileScreen() {
   const menuItems = [
     { icon: '📋', label: '예약 내역', onPress: () => {} },
     { icon: '⭐', label: '내가 쓴 리뷰', onPress: () => {} },
-    { icon: '❤️', label: '찜한 병원', onPress: () => {} },
+    { icon: '❤️', label: '찜한 병원', onPress: () => navigation.navigate('Favorites') },
     { icon: '🔔', label: '알림 설정', onPress: () => {} },
     { icon: '❓', label: '고객센터', onPress: () => {} },
     { icon: '📄', label: '이용약관', onPress: () => {} },
@@ -221,5 +236,11 @@ const styles = StyleSheet.create({
   loginBtnText: { fontSize: 15, fontWeight: '700', color: '#FFFFFF' },
   errorText: {
     fontSize: 13, color: '#DC2626', textAlign: 'center', marginBottom: 12,
+  },
+  signupLink: {
+    alignItems: 'center', marginTop: 20, paddingVertical: 8,
+  },
+  signupLinkText: {
+    fontSize: 14, color: '#6B7280',
   },
 });

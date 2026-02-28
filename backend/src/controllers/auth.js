@@ -23,7 +23,7 @@ const { successResponse, errorResponse } = require('../utils/response');
  */
 const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: user.user_id, email: user.email, type: 'access' },
+    { id: user.user_id, email: user.email, role: user.role || 'PATIENT', type: 'access' },
     env.jwt.secret,
     { expiresIn: env.jwt.accessExpiresIn }
   );
@@ -35,7 +35,7 @@ const generateAccessToken = (user) => {
  */
 const generateRefreshToken = (user) => {
   return jwt.sign(
-    { id: user.user_id, email: user.email, type: 'refresh' },
+    { id: user.user_id, email: user.email, role: user.role || 'PATIENT', type: 'refresh' },
     env.jwt.secret,
     { expiresIn: env.jwt.refreshExpiresIn }
   );
@@ -90,7 +90,7 @@ const signup = async (req, res, next) => {
     // 비밀번호 해싱 (bcrypt, salt round 12)
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // 사용자 생성
+    // 사용자 생성 (기본 역할: PATIENT)
     const user = await User.create({
       email,
       password: hashedPassword,
@@ -98,12 +98,15 @@ const signup = async (req, res, next) => {
       phone,
     });
 
+    // 신규 가입자에게 기본 역할 설정
+    user.role = user.role || 'PATIENT';
+
     // 토큰 발급
     const tokens = await issueTokens(user);
 
     return successResponse(
       res,
-      { user, ...tokens },
+      { user: sanitizeUser(user), ...tokens },
       '회원가입이 완료되었습니다',
       201
     );
@@ -146,10 +149,11 @@ const login = async (req, res, next) => {
     // 토큰 발급
     const tokens = await issueTokens(user);
 
-    // 병원 소유자인 경우 hospital_id 포함
+    // 병원 소유자인 경우 hospital_id 포함, 역할 정보 포함
     const hospital = await Hospital.findByOwnerId(user.user_id);
     const safeUser = {
       ...sanitizeUser(user),
+      role: user.role || 'PATIENT',
       hospital_id: hospital?.hospital_id || null,
     };
 
@@ -304,9 +308,9 @@ const refresh = async (req, res, next) => {
       return errorResponse(res, '토큰이 무효화되었습니다. 다시 로그인해주세요', 401);
     }
 
-    // 새 액세스 토큰 발급
+    // 새 액세스 토큰 발급 (역할 포함)
     const accessToken = jwt.sign(
-      { id: decoded.id, email: decoded.email, type: 'access' },
+      { id: decoded.id, email: decoded.email, role: decoded.role || 'PATIENT', type: 'access' },
       env.jwt.secret,
       { expiresIn: env.jwt.accessExpiresIn }
     );

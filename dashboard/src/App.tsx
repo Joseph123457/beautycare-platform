@@ -10,6 +10,10 @@ import Chats from './pages/Chats';
 import Patients from './pages/Patients';
 import Analytics from './pages/Analytics';
 import ProfilePage from './pages/ProfilePage';
+import ContentManagement from './pages/ContentManagement';
+import AdminHospitals from './pages/AdminHospitals';
+import AdminUsers from './pages/AdminUsers';
+import AdminContentApproval from './pages/AdminContentApproval';
 
 /** 루트 컴포넌트 – 라우팅 및 인증 관리 */
 export default function App() {
@@ -43,7 +47,7 @@ export default function App() {
         <Route
           element={
             isAuthenticated ? (
-              <Layout userName={user?.name || ''} onLogout={logout} />
+              <Layout userName={user?.name || ''} userRole={user?.role} onLogout={logout} />
             ) : (
               <Navigate to="/login" replace />
             )
@@ -57,6 +61,10 @@ export default function App() {
           <Route path="patients" element={<Patients />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="profile" element={<ProfilePage />} />
+          <Route path="contents" element={<ContentManagement />} />
+          <Route path="admin/hospitals" element={<AdminHospitals />} />
+          <Route path="admin/users" element={<AdminUsers />} />
+          <Route path="admin/approval" element={<AdminContentApproval />} />
         </Route>
 
         {/* 존재하지 않는 경로 → 홈으로 리다이렉트 */}

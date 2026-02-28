@@ -6,6 +6,7 @@ interface User {
   email: string;
   name: string;
   hospital_id: string | null;
+  role: 'PATIENT' | 'HOSPITAL_ADMIN' | 'SUPER_ADMIN';
 }
 
 interface AuthState {

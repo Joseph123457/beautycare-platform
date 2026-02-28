@@ -1,16 +1,15 @@
 /**
  * 네비게이션 설정
- * 탭 네비게이터 (5개 탭) + 루트 스택 네비게이터 (상세 화면)
+ * 탭 네비게이터 (4개 탭: 피드, 탐색, 채팅, 마이) + 루트 스택 네비게이터
  */
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 
-import HomeScreen from '../screens/HomeScreen';
+import FeedScreen from '../screens/FeedScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ChatListScreen from '../screens/ChatListScreen';
-import MyReservationsScreen from '../screens/MyReservationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import HospitalDetailScreen from '../screens/HospitalDetailScreen';
 import ReviewListScreen from '../screens/ReviewListScreen';
@@ -18,6 +17,9 @@ import BookingScreen from '../screens/BookingScreen';
 import MapScreen from '../screens/MapScreen';
 import ChatRoomScreen from '../screens/ChatRoomScreen';
 import ReviewWriteScreen from '../screens/ReviewWriteScreen';
+import ContentDetailScreen from '../screens/ContentDetailScreen';
+import FavoritesScreen from '../screens/FavoritesScreen';
+import SignupScreen from '../screens/SignupScreen';
 
 import { RootStackParamList, TabParamList } from '../types';
 
@@ -27,10 +29,9 @@ const Stack = createStackNavigator<RootStackParamList>();
 // ─── 탭 아이콘 (텍스트 이모지 대체) ───────────────────
 
 const TAB_ICONS: Record<string, string> = {
-  Home: '🏠',
+  Feed: '📷',
   Search: '🔍',
   Chat: '💬',
-  MyReservations: '📅',
   Profile: '👤',
 };
 
@@ -57,10 +58,9 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: '홈' }} />
+      <Tab.Screen name="Feed" component={FeedScreen} options={{ tabBarLabel: '피드' }} />
       <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarLabel: '탐색' }} />
       <Tab.Screen name="Chat" component={ChatListScreen} options={{ tabBarLabel: '채팅' }} />
-      <Tab.Screen name="MyReservations" component={MyReservationsScreen} options={{ tabBarLabel: '예약' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: '마이' }} />
     </Tab.Navigator>
   );
@@ -112,6 +112,21 @@ export default function RootNavigator() {
         name="ReviewWrite"
         component={ReviewWriteScreen}
         options={{ title: '리뷰 작성' }}
+      />
+      <Stack.Screen
+        name="ContentDetail"
+        component={ContentDetailScreen}
+        options={{ title: '콘텐츠 상세' }}
+      />
+      <Stack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
+        options={{ title: '찜한 콘텐츠' }}
+      />
+      <Stack.Screen
+        name="Signup"
+        component={SignupScreen}
+        options={{ title: '회원가입' }}
       />
     </Stack.Navigator>
   );
