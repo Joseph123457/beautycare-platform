@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // 개발 환경에서는 로컬 서버 주소 사용
 // 실기기 테스트 시 컴퓨터 IP로 변경 필요
 const BASE_URL = __DEV__
-  ? 'http://10.0.2.2:3000/api'  // Android 에뮬레이터
+  ? 'http://192.168.0.17:3000/api'  // 실기기 테스트용 로컬 IP
   : 'https://api.beautycare.com/api';
 
 const client = axios.create({

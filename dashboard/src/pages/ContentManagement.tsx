@@ -58,7 +58,8 @@ export default function ContentManagement() {
     setLoading(true);
     try {
       const { data } = await client.get('/feed/hospital/mine');
-      setContents(data.data || []);
+      const result = data.data;
+      setContents(Array.isArray(result) ? result : result?.contents || []);
     } catch {
       // 로드 실패 시 빈 배열 유지
     } finally {

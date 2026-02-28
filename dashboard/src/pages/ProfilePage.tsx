@@ -153,7 +153,7 @@ export default function ProfilePage() {
         />
         <StatCard
           title="평균 평점"
-          value={hospital.avg_rating?.toFixed(1) || '0.0'}
+          value={Number(hospital.avg_rating || 0).toFixed(1)}
           subtitle={`리뷰 ${hospital.review_count}개`}
           color="orange"
           icon={

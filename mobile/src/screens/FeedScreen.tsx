@@ -1,16 +1,18 @@
 /**
  * 피드 화면
  * TikTok 스타일 전체화면 세로 스크롤 피드
- * 카테고리 필터 + 좋아요 + 상담 예약 CTA
+ * 다크 모던 디자인 + Ionicons
  */
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  Dimensions, ScrollView, ActivityIndicator, RefreshControl,
+  Dimensions, ScrollView, ActivityIndicator, RefreshControl, Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import client from '../api/client';
 import { FeedContent, RootStackParamList } from '../types';
@@ -18,7 +20,7 @@ import PhotoCarousel from '../components/PhotoCarousel';
 
 type Nav = StackNavigationProp<RootStackParamList>;
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ─── 카테고리 목록 ────────────────────────────────────────
 const CATEGORIES = ['전체', '성형외과', '피부과', '치과', '안과'];
@@ -27,60 +29,86 @@ const CATEGORIES = ['전체', '성형외과', '피부과', '치과', '안과'];
 
 interface FeedItemProps {
   item: FeedContent;
+  itemHeight: number;
+  tabBarHeight: number;
   onFavoriteToggle: (id: number, isFav: boolean) => void;
   onNavigateDetail: (id: number) => void;
   onNavigateBooking: (hospitalId: number, hospitalName: string) => void;
 }
 
 const FeedItem = React.memo(function FeedItem({
-  item, onFavoriteToggle, onNavigateDetail, onNavigateBooking,
+  item, itemHeight, tabBarHeight, onFavoriteToggle, onNavigateDetail, onNavigateBooking,
 }: FeedItemProps) {
   return (
-    <View style={styles.feedItem}>
+    <View style={[styles.feedItem, { height: itemHeight }]}>
       {/* 전체화면 사진 캐러셀 */}
-      <PhotoCarousel photos={item.photo_urls} height={SCREEN_HEIGHT} />
+      <PhotoCarousel photos={item.photo_urls} height={itemHeight} />
 
-      {/* 하단 그라데이션 오버레이 */}
-      <View style={styles.gradientOverlay}>
-        {/* 병원 정보 */}
-        <Text style={styles.hospitalName}>{item.hospital_name}</Text>
-        <View style={styles.categoryBadge}>
-          <Text style={styles.categoryBadgeText}>{item.category}</Text>
+      {/* 하단 콘텐츠 오버레이 */}
+      <View style={[styles.overlay, { paddingBottom: 20 }]}>
+        {/* 병원명 + 카테고리 */}
+        <View style={styles.hospitalRow}>
+          <Text style={styles.hospitalName}>{item.hospital_name}</Text>
+          <View style={styles.categoryBadge}>
+            <Text style={styles.categoryBadgeText}>{item.category}</Text>
+          </View>
         </View>
+
+        {/* 설명 */}
         <Text style={styles.description} numberOfLines={2}>
           {item.description}
         </Text>
-        <Text style={styles.pricingInfo}>{item.pricing_info}</Text>
 
-        {/* 상담 예약 버튼 */}
+        {/* 가격 정보 */}
+        {item.pricing_info ? (
+          <Text style={styles.pricingInfo}>{item.pricing_info}</Text>
+        ) : null}
+
+        {/* 상담 예약 CTA */}
         <TouchableOpacity
           style={styles.ctaBtn}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           onPress={() => onNavigateBooking(item.hospital_id, item.hospital_name)}
         >
+          <Ionicons name="calendar-outline" size={16} color="#FFF" style={{ marginRight: 6 }} />
           <Text style={styles.ctaBtnText}>상담 예약</Text>
         </TouchableOpacity>
       </View>
 
       {/* 우측 액션 버튼 */}
-      <View style={styles.actionButtons}>
+      <View style={[styles.actionButtons, { bottom: 100 }]}>
         {/* 좋아요 */}
         <TouchableOpacity
           style={styles.actionBtn}
           onPress={() => onFavoriteToggle(item.content_id, !!item.is_favorite)}
         >
-          <Text style={styles.actionIcon}>
-            {item.is_favorite ? '❤️' : '🤍'}
-          </Text>
+          <View style={[styles.actionCircle, item.is_favorite && styles.actionCircleActive]}>
+            <Ionicons
+              name={item.is_favorite ? 'heart' : 'heart-outline'}
+              size={22}
+              color={item.is_favorite ? '#FF4D6A' : '#FFFFFF'}
+            />
+          </View>
           <Text style={styles.actionCount}>{item.like_count}</Text>
         </TouchableOpacity>
 
-        {/* 상세 정보 */}
+        {/* 조회수 */}
+        <View style={styles.actionBtn}>
+          <View style={styles.actionCircle}>
+            <Ionicons name="eye-outline" size={22} color="#FFFFFF" />
+          </View>
+          <Text style={styles.actionCount}>{item.view_count}</Text>
+        </View>
+
+        {/* 상세 보기 */}
         <TouchableOpacity
           style={styles.actionBtn}
           onPress={() => onNavigateDetail(item.content_id)}
         >
-          <Text style={styles.actionIcon}>ℹ️</Text>
+          <View style={styles.actionCircle}>
+            <Ionicons name="arrow-forward-circle-outline" size={22} color="#FFFFFF" />
+          </View>
+          <Text style={styles.actionCount}>상세</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -91,6 +119,11 @@ const FeedItem = React.memo(function FeedItem({
 
 export default function FeedScreen() {
   const navigation = useNavigation<Nav>();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+
+  // 실제 피드 아이템 높이 = 화면 높이 - 탭바 높이
+  const ITEM_HEIGHT = Dimensions.get('window').height - tabBarHeight;
 
   // 데이터 상태
   const [feedData, setFeedData] = useState<FeedContent[]>([]);
@@ -116,7 +149,6 @@ export default function FeedScreen() {
           });
           setLocation({ lat: loc.coords.latitude, lng: loc.coords.longitude });
         } else {
-          // 기본 좌표 (강남역)
           setLocation({ lat: 37.4979, lng: 127.0276 });
         }
       } catch {
@@ -142,7 +174,7 @@ export default function FeedScreen() {
       if (cursorVal) params.cursor = cursorVal;
 
       const { data } = await client.get('/feed', { params });
-      const items: FeedContent[] = data.data?.items || data.data || [];
+      const items: FeedContent[] = data.data?.contents || data.data?.items || [];
       const nextCursor = data.data?.next_cursor || null;
 
       if (isRefresh) {
@@ -167,7 +199,7 @@ export default function FeedScreen() {
     }
   }, [location]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 카테고리 변경 핸들러
+  // 카테고리 변경
   const handleCategoryChange = useCallback((category: string) => {
     setSelectedCategory(category);
     setCursor(null);
@@ -199,7 +231,6 @@ export default function FeedScreen() {
       } else {
         await client.post(`/favorites/${contentId}`);
       }
-      // 로컬 상태 업데이트
       setFeedData((prev) =>
         prev.map((item) =>
           item.content_id === contentId
@@ -212,7 +243,7 @@ export default function FeedScreen() {
         )
       );
     } catch {
-      // 에러 무시 (로그인 필요 등)
+      // 에러 무시
     }
   }, []);
 
@@ -229,20 +260,21 @@ export default function FeedScreen() {
   const renderFeedItem = useCallback(({ item }: { item: FeedContent }) => (
     <FeedItem
       item={item}
+      itemHeight={ITEM_HEIGHT}
+      tabBarHeight={tabBarHeight}
       onFavoriteToggle={handleFavoriteToggle}
       onNavigateDetail={handleNavigateDetail}
       onNavigateBooking={handleNavigateBooking}
     />
-  ), [handleFavoriteToggle, handleNavigateDetail, handleNavigateBooking]);
+  ), [ITEM_HEIGHT, tabBarHeight, handleFavoriteToggle, handleNavigateDetail, handleNavigateBooking]);
 
   const keyExtractor = useCallback((item: FeedContent) => String(item.content_id), []);
 
-  // 고정 높이 레이아웃 (성능 최적화)
   const getItemLayout = useCallback((_: any, index: number) => ({
-    length: SCREEN_HEIGHT,
-    offset: SCREEN_HEIGHT * index,
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
     index,
-  }), []);
+  }), [ITEM_HEIGHT]);
 
   // ─── 렌더링 ───────────────────────────────────────────
   return (
@@ -257,7 +289,7 @@ export default function FeedScreen() {
           data={feedData}
           keyExtractor={keyExtractor}
           renderItem={renderFeedItem}
-          snapToInterval={SCREEN_HEIGHT}
+          snapToInterval={ITEM_HEIGHT}
           snapToAlignment="start"
           decelerationRate="fast"
           pagingEnabled
@@ -269,26 +301,20 @@ export default function FeedScreen() {
           onEndReached={onEndReached}
           onEndReachedThreshold={0.5}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="#FFFFFF"
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFFFFF" />
           }
           ListEmptyComponent={
-            <View style={[styles.feedItem, styles.emptyContainer]}>
-              <Text style={{ fontSize: 48 }}>📷</Text>
+            <View style={[styles.feedItem, { height: ITEM_HEIGHT }, styles.emptyContainer]}>
+              <Ionicons name="images-outline" size={48} color="rgba(255,255,255,0.3)" />
               <Text style={styles.emptyTitle}>콘텐츠가 없습니다</Text>
-              <Text style={styles.emptySubtitle}>
-                다른 카테고리를 선택해보세요
-              </Text>
+              <Text style={styles.emptySubtitle}>다른 카테고리를 선택해보세요</Text>
             </View>
           }
         />
       )}
 
-      {/* 상단 카테고리 필터 (절대 위치) */}
-      <SafeAreaView style={styles.categoryOverlay} edges={['top']}>
+      {/* 상단 카테고리 필터 */}
+      <View style={[styles.categoryOverlay, { paddingTop: insets.top + 8 }]}>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -299,25 +325,17 @@ export default function FeedScreen() {
             return (
               <TouchableOpacity
                 key={cat}
-                style={[
-                  styles.categoryChip,
-                  isActive && styles.categoryChipActive,
-                ]}
+                style={[styles.categoryChip, isActive && styles.categoryChipActive]}
                 onPress={() => handleCategoryChange(cat)}
               >
-                <Text
-                  style={[
-                    styles.categoryChipText,
-                    isActive && styles.categoryChipTextActive,
-                  ]}
-                >
+                <Text style={[styles.categoryChipText, isActive && styles.categoryChipTextActive]}>
                   {cat}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </ScrollView>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
@@ -327,17 +345,16 @@ export default function FeedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#0A0A0A',
   },
 
-  // ─── 로딩 ─────────────────────────────────────────────
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  // ─── 카테고리 필터 (상단 오버레이) ────────────────────
+  // ─── 카테고리 필터 ──────────────────────────────────────
   categoryOverlay: {
     position: 'absolute',
     top: 0,
@@ -347,116 +364,137 @@ const styles = StyleSheet.create({
   },
   categoryBar: {
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingBottom: 8,
     gap: 8,
   },
   categoryChip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: 20,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: 'rgba(255,255,255,0.12)',
   },
   categoryChipActive: {
     backgroundColor: '#FFFFFF',
-    borderColor: '#FFFFFF',
   },
   categoryChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: 'rgba(255,255,255,0.8)',
   },
   categoryChipTextActive: {
-    color: '#1F2937',
+    color: '#0A0A0A',
   },
 
-  // ─── 피드 아이템 ──────────────────────────────────────
+  // ─── 피드 아이템 ────────────────────────────────────────
   feedItem: {
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    backgroundColor: '#000000',
+    backgroundColor: '#0A0A0A',
   },
 
-  // ─── 그라데이션 오버레이 ──────────────────────────────
-  gradientOverlay: {
+  // ─── 하단 콘텐츠 오버레이 ──────────────────────────────
+  overlay: {
     position: 'absolute',
     bottom: 0,
     left: 0,
-    right: 0,
-    paddingHorizontal: 20,
-    paddingBottom: 100,
-    paddingTop: 80,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    right: 80,
+    paddingHorizontal: 18,
+    paddingTop: 60,
+    backgroundColor: 'transparent',
+  },
+  hospitalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
   },
   hospitalName: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     color: '#FFFFFF',
-    marginBottom: 6,
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   categoryBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    marginBottom: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.18)',
   },
   categoryBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.9)',
   },
   description: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    lineHeight: 20,
-    marginBottom: 6,
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    lineHeight: 19,
+    marginBottom: 5,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   pricingInfo: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#E8772E',
-    marginBottom: 16,
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#FFB347',
+    marginBottom: 12,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
 
-  // ─── CTA 버튼 ─────────────────────────────────────────
+  // ─── CTA 버튼 ──────────────────────────────────────────
   ctaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#1E5FA8',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.25)',
   },
   ctaBtnText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#FFFFFF',
   },
 
-  // ─── 우측 액션 버튼 ───────────────────────────────────
+  // ─── 우측 액션 버튼 ────────────────────────────────────
   actionButtons: {
     position: 'absolute',
-    right: 16,
-    bottom: 180,
+    right: 14,
     alignItems: 'center',
-    gap: 20,
+    gap: 16,
   },
   actionBtn: {
     alignItems: 'center',
   },
-  actionIcon: {
-    fontSize: 28,
+  actionCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionCircleActive: {
+    backgroundColor: 'rgba(255, 77, 106, 0.15)',
   },
   actionCount: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#FFFFFF',
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: 3,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 
-  // ─── 빈 상태 ──────────────────────────────────────────
+  // ─── 빈 상태 ───────────────────────────────────────────
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -464,12 +502,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: 'rgba(255,255,255,0.6)',
     marginTop: 12,
   },
   emptySubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    color: 'rgba(255,255,255,0.35)',
     marginTop: 4,
   },
 });
