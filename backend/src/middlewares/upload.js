@@ -12,7 +12,7 @@ const path = require('path');
 const fs = require('fs');
 
 // 업로드 디렉토리 생성 (없으면)
-const uploadDir = path.join(__dirname, '../../../uploads');
+const uploadDir = path.join(__dirname, '../../uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }

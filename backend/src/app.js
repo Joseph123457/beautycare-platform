@@ -56,7 +56,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 업로드 파일 정적 서빙
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 다국어 처리 (Accept-Language 감지 → req.language, req.t 주입)
 app.use(i18nMiddleware);

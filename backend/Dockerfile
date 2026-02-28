@@ -18,6 +18,9 @@ COPY --from=builder /app/package*.json ./
 # 소스 코드 복사
 COPY src/ ./src/
 
+# 업로드 디렉토리 생성 (appuser 소유)
+RUN mkdir -p /app/uploads && chown appuser:appgroup /app/uploads
+
 # non-root 사용자로 전환
 USER appuser
 
